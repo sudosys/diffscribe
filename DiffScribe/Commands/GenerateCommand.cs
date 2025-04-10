@@ -6,7 +6,11 @@ public class GenerateCommand : ICommand
 
     public string Description => "Generate a commit title based on the staged changes and desired commit structure.";
 
-    public string[] DefinedArguments => ["—auto-commit", "—auto-push"];
+    public CommandArgument[] DefinedArguments => 
+        [
+            new("--auto-commit", "Commit automatically after generation", typeof(bool), optional: true),
+            new("--auto-push", "Commit & push automatically after generation", typeof(bool), optional: true)
+        ];
     
     public void Execute(string[] args)
     {

@@ -4,7 +4,6 @@ public interface ICommand
 {
     string Name { get; }
     string Description { get; }
-    string[] DefinedArguments { get; }
-    
+    CommandArgument[] DefinedArguments { get; }
     void Execute(string[] args);
 }

@@ -6,7 +6,7 @@ public class RootCommand : ICommand
 
     public string Description => "Root command of the CLI tool.";
 
-    public string[] DefinedArguments => [];
+    public CommandArgument[] DefinedArguments => [];
     
     public void Execute(string[] args)
     {
