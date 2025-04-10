@@ -7,6 +7,7 @@ public class CommandDispatcher
 {
     private readonly Dictionary<string, ICommand> _commandMappings = new()
     {
+        { "root", new RootCommand() },
         { "generate", new GenerateCommand() }
     };
     

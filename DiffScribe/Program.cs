@@ -5,15 +5,15 @@ namespace DiffScribe;
 
 class Program
 {
-    static void Main(string[] args)
+    public static void Main(string[] args)
     {
         var serviceCollection = RegisterServices();
-        
-        var commandInfo = CommandParser.Parse(args);
-
         var serviceProvider = serviceCollection.BuildServiceProvider();
+
+        var commandParser = serviceProvider.GetRequiredService<CommandParser>();
+        var commandInfo = commandParser.Parse(args);
+
         var commandDispatcher = serviceProvider.GetRequiredService<CommandDispatcher>();
-        
         commandDispatcher.Dispatch(commandInfo);
     }
 

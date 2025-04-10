@@ -10,6 +10,6 @@ public class GenerateCommand : ICommand
     
     public void Execute(string[] args)
     {
-        throw new NotImplementedException();
+        Console.WriteLine(Description);
     }
 }
