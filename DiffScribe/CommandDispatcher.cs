@@ -8,7 +8,8 @@ public class CommandDispatcher(ArgumentValidator argumentValidator)
     private readonly Dictionary<string, ICommand> _commandMappings = new()
     {
         { "root", new RootCommand() },
-        { "generate", new GenerateCommand() }
+        { "generate", new GenerateCommand() },
+        { "config", new ConfigurationCommand() }
     };
     
     public void Dispatch(CommandInfo commandInfo)
@@ -23,7 +24,7 @@ public class CommandDispatcher(ArgumentValidator argumentValidator)
         }
         else
         {
-            Console.WriteLine($"Unknown command: {commandInfo.Name}");
+            ConsoleWrapper.Error($"Unknown command: {commandInfo.Name}");
         }
     }
 }

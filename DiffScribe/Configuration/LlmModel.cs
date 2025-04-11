@@ -1,0 +1,8 @@
+namespace DiffScribe.Configuration;
+
+public enum LlmModel
+{
+    Gpt3_5,
+    Gpt4o,
+    Gpt4oMini,
+}
