@@ -3,13 +3,13 @@ using DiffScribe.Parser;
 
 namespace DiffScribe;
 
-public class CommandDispatcher(ArgumentValidator argumentValidator)
+public class CommandDispatcher(ArgumentValidator argumentValidator, IServiceProvider provider)
 {
     private readonly Dictionary<string, ICommand> _commandMappings = new()
     {
         { "root", new RootCommand() },
         { "generate", new GenerateCommand() },
-        { "config", new ConfigurationCommand() }
+        { "config", new ConfigurationCommand(provider) }
     };
     
     public void Dispatch(CommandInfo commandInfo)

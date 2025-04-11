@@ -1,4 +1,5 @@
-﻿using DiffScribe.Parser;
+﻿using DiffScribe.Configuration;
+using DiffScribe.Parser;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace DiffScribe;
@@ -24,7 +25,8 @@ class Program
         serviceCollection
             .AddSingleton<CommandParser>()
             .AddSingleton<CommandDispatcher>()
-            .AddSingleton<ArgumentValidator>();
+            .AddSingleton<ArgumentValidator>()
+            .AddSingleton<ConfigHandler>();
         
         return serviceCollection;
     }

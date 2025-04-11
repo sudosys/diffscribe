@@ -4,7 +4,7 @@ namespace DiffScribe;
 
 public class ArgumentValidator
 {
-    public bool Validate(CommandArgument[] definedArguments, Dictionary<string, string?> givenArguments)
+    public bool Validate(CommandArgument[] definedArguments, Dictionary<string, object?> givenArguments)
     {
         foreach (var (argument, value) in givenArguments)
         {
