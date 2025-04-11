@@ -3,7 +3,7 @@ using DiffScribe.Parser;
 
 namespace DiffScribe;
 
-public class CommandDispatcher
+public class CommandDispatcher(ArgumentValidator argumentValidator)
 {
     private readonly Dictionary<string, ICommand> _commandMappings = new()
     {
@@ -16,7 +16,10 @@ public class CommandDispatcher
         if (_commandMappings.TryGetValue(commandInfo.Name, out var command) 
             && commandInfo.Name == command.Name)
         {
-            command.Execute(commandInfo.Arguments);
+            if (argumentValidator.Validate(command.DefinedArguments, commandInfo.Arguments))
+            {
+                command.Execute(commandInfo.Arguments);
+            }
         }
         else
         {

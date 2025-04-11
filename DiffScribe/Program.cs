@@ -23,7 +23,8 @@ class Program
 
         serviceCollection
             .AddSingleton<CommandParser>()
-            .AddSingleton<CommandDispatcher>();
+            .AddSingleton<CommandDispatcher>()
+            .AddSingleton<ArgumentValidator>();
         
         return serviceCollection;
     }
