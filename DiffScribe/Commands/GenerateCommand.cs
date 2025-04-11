@@ -14,7 +14,7 @@ public class GenerateCommand : ICommand
             new("--auto-push", "Commit & push automatically after generation", typeof(bool), optional: true)
         ];
     
-    public void Execute(string[] args)
+    public void Execute(Dictionary<string, string?> args)
     {
         Console.WriteLine(Description);
     }
