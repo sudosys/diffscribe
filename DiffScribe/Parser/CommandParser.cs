@@ -18,9 +18,9 @@ public class CommandParser
         return new CommandInfo(command, parsedArguments);
     }
 
-    private Dictionary<string, string?> ParseArguments(string[] args)
+    private Dictionary<string, object?> ParseArguments(string[] args)
     {
-        Dictionary<string, string?> parsedArgs = new();
+        Dictionary<string, object?> parsedArgs = new();
         
         var argsLength = args.Length;
         for (var i = 0; i < argsLength; i++)
@@ -32,7 +32,7 @@ public class CommandParser
             
             if (i + 1 < argsLength && !args[i + 1].StartsWith("--"))
             {
-                parsedArgs.Add(args[i], args[i + 1]);
+                parsedArgs.Add(args[i], ParseValue(args[i + 1]));
                 i++;
             }
             else
@@ -42,5 +42,20 @@ public class CommandParser
         }
 
         return parsedArgs;
+    }
+
+    private object ParseValue(string value)
+    {
+        if (int.TryParse(value, out var parsedInt))
+        {
+            return parsedInt;
+        }
+
+        if (bool.TryParse(value, out var parsedBool))
+        {
+            return parsedBool;
+        }
+        
+        return value;
     }
 }

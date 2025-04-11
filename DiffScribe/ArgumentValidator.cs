@@ -26,18 +26,12 @@ public class ArgumentValidator
         return true;
     }
 
-    private bool ValidateValueType(string? value, CommandArgument argumentDefinition)
-    {
-        if (int.TryParse(value, out _))
+    private bool ValidateValueType(object? value, CommandArgument argumentDefinition) =>
+        value switch
         {
-            return argumentDefinition.Type == typeof(int);
-        }
-
-        if (value is null || bool.TryParse(value, out _))
-        {
-            return argumentDefinition.Type == typeof(bool);
-        }
-        
-        return argumentDefinition.Type == typeof(string);
-    }
+            int => argumentDefinition.Type == typeof(int),
+            bool => argumentDefinition.Type == typeof(bool),
+            null => argumentDefinition.Type == typeof(bool) || argumentDefinition.Type == typeof(void),
+            _ => argumentDefinition.Type == typeof(string)
+        };
 }

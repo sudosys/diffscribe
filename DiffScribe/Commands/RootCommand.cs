@@ -10,7 +10,7 @@ public class RootCommand : ICommand
 
     public CommandArgument[] DefinedArguments => [];
     
-    public void Execute(Dictionary<string, string?> args)
+    public void Execute(Dictionary<string, object?> args)
     {
         Console.WriteLine(Description);
     }

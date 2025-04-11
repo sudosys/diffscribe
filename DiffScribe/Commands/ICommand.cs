@@ -10,5 +10,5 @@ public interface ICommand
     
     CommandArgument[] DefinedArguments { get; }
     
-    void Execute(Dictionary<string, string?> args);
+    void Execute(Dictionary<string, object?> args);
 }
