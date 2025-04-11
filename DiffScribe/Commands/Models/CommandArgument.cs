@@ -1,4 +1,4 @@
-namespace DiffScribe.Commands;
+namespace DiffScribe.Commands.Models;
 
 public class CommandArgument(string name, string description, Type type, bool optional)
 {

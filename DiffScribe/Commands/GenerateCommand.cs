@@ -1,3 +1,5 @@
+using DiffScribe.Commands.Models;
+
 namespace DiffScribe.Commands;
 
 public class GenerateCommand : ICommand
