@@ -1,4 +1,6 @@
-﻿using DiffScribe.Configuration;
+﻿using DiffScribe.AI;
+using DiffScribe.Configuration;
+using DiffScribe.Git;
 using DiffScribe.Parser;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -26,7 +28,9 @@ class Program
             .AddSingleton<CommandParser>()
             .AddSingleton<CommandDispatcher>()
             .AddSingleton<ArgumentValidator>()
-            .AddSingleton<ConfigHandler>();
+            .AddSingleton<ConfigHandler>()
+            .AddSingleton<GitRunner>()
+            .AddScoped<OpenAiClient>();
         
         return serviceCollection;
     }

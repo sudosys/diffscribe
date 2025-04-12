@@ -8,7 +8,7 @@ public class CommandDispatcher(ArgumentValidator argumentValidator, IServiceProv
     private readonly Dictionary<string, ICommand> _commandMappings = new()
     {
         { "root", new RootCommand() },
-        { "generate", new GenerateCommand() },
+        { "generate", new GenerateCommand(provider) },
         { "config", new ConfigurationCommand(provider) }
     };
     
