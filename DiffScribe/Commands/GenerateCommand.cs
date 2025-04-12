@@ -1,3 +1,4 @@
+using DiffScribe.AI;
 using DiffScribe.Commands.Models;
 using DiffScribe.Git;
 using Microsoft.Extensions.DependencyInjection;
@@ -18,14 +19,22 @@ public class GenerateCommand(IServiceProvider provider) : ICommand
     
     private readonly GitRunner _gitRunner = provider.GetRequiredService<GitRunner>();
     
+    private readonly CommitGenerator _commitGenerator = provider.GetRequiredService<CommitGenerator>();
+    
     public void Execute(Dictionary<string, object?> args)
     {
         if (!ValidateVersionControl())
         {
             return;
         }
+        
+        Console.WriteLine("Generating commit message based on your changes...");
 
-        // var stagedDiffs = _gitRunner.GetStagedDiffs();
+        var stagedDiffs = _gitRunner.GetStagedDiffs();
+        
+        var commitMessage = _commitGenerator.GenerateCommitMessage(stagedDiffs);
+        
+        ConsoleWrapper.Success($"Generated commit message: {commitMessage}");
     }
 
     private bool ValidateVersionControl()

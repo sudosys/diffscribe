@@ -30,7 +30,8 @@ class Program
             .AddSingleton<ArgumentValidator>()
             .AddSingleton<ConfigHandler>()
             .AddSingleton<GitRunner>()
-            .AddScoped<OpenAiClient>();
+            .AddScoped<OpenAiClient>()
+            .AddSingleton<CommitGenerator>();
         
         return serviceCollection;
     }

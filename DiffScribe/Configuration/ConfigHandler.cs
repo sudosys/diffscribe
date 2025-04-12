@@ -1,6 +1,5 @@
 using System.Reflection;
 using System.Text.Json;
-using System.Text.Json.Nodes;
 using ConsoleTables;
 
 namespace DiffScribe.Configuration;
@@ -22,13 +21,13 @@ public class ConfigHandler
     };
 
     private const int MaxValueColumnWidth = 25; 
-    private const string NotSetValuePlaceHolder = "<NOT SET>"; 
+    private const string NotSetValuePlaceHolder = "<NOT SET>";
+
+    public ToolConfiguration Configuration => GetConfigurationFromFile();
 
     public void ReadConfigFile()
     {
-        var toolConfig = GetConfigurationFromFile();
-        
-        var table = CreateConfigurationInformation(toolConfig);
+        var table = CreateConfigurationInformation();
         
         table.Write(Format.Minimal);
     }
@@ -59,15 +58,15 @@ public class ConfigHandler
         }
     }
 
-    private ConsoleTable CreateConfigurationInformation(ToolConfiguration toolConfig)
+    private ConsoleTable CreateConfigurationInformation()
     {
-        var type = toolConfig.GetType();
+        var type = Configuration.GetType();
         var properties = type.GetProperties();
 
         var table = new ConsoleTable("Configuration", "Value");
         foreach (var propertyInfo in properties)
         {
-            table.AddRow(propertyInfo.Name.PascalToTitleCase(), GetPropertyValue(toolConfig, propertyInfo));
+            table.AddRow(propertyInfo.Name.PascalToTitleCase(), GetPropertyValue(Configuration, propertyInfo));
         }
         
         return table;
