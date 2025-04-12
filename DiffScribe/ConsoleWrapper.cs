@@ -19,6 +19,14 @@ public static class ConsoleWrapper
         Console.ResetColor();
         Console.WriteLine(line);
     }
+    
+    public static void Success(string line)
+    {
+        Console.ForegroundColor = ConsoleColor.Green;
+        Console.Write("\u2705  Success ");
+        Console.ResetColor();
+        Console.WriteLine(line);
+    }
 
     public static int ShowSelectionList(ImmutableArray<string> options, string title = "Make a selection, then press ENTER")
     {

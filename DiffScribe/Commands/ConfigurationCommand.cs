@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using DiffScribe.AI;
 using DiffScribe.Commands.Models;
 using DiffScribe.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -26,17 +27,19 @@ public class ConfigurationCommand(IServiceProvider provider) : ICommand
             new(AutoPushArg, "Commit & push automatically after generation.", typeof(bool), optional: true)
         ];
     
+    private readonly ConfigHandler _configHandler = provider.GetRequiredService<ConfigHandler>();
+    
+    private readonly OpenAiClient _openAiClient = provider.GetRequiredService<OpenAiClient>();
+
     public void Execute(Dictionary<string, object?> args)
     {
-        var configHandler = provider.GetRequiredService<ConfigHandler>();
-
         if (args.Count == 0)
         {
-            ShowCurrentConfiguration(configHandler);
+            ShowCurrentConfiguration();
             return;
         }
         
-        var toolConfig = configHandler.GetConfigurationFromFile();
+        var toolConfig = _configHandler.GetConfigurationFromFile();
 
         foreach (var (arg, value) in args)
         {
@@ -46,7 +49,7 @@ public class ConfigurationCommand(IServiceProvider provider) : ICommand
                     toolConfig.CommitStructure = value.ToString()!;
                     break;
                 case ApiKeyArg when value is not null:
-                    toolConfig.ApiKey = value.ToString()!;
+                    UpdateApiKey(ref toolConfig, value.ToString()!);
                     break;
                 case AutoCommitArg when value is not null:
                     toolConfig.AutoCommit = (bool)value;
@@ -61,13 +64,25 @@ public class ConfigurationCommand(IServiceProvider provider) : ICommand
             }
         }
         
-        configHandler.UpdateConfiguration(toolConfig);
+        _configHandler.UpdateConfiguration(toolConfig);
     }
 
-    private void ShowCurrentConfiguration(ConfigHandler configHandler)
+    private void ShowCurrentConfiguration()
     {
-        configHandler.TryCreateConfigFile();
-        configHandler.ReadConfigFile();
+        _configHandler.TryCreateConfigFile();
+        _configHandler.ReadConfigFile();
+    }
+
+    private void UpdateApiKey(ref ToolConfiguration configuration, string apiKey)
+    {
+        if (!_openAiClient.TestApiKeyValidity(apiKey))
+        {
+            ConsoleWrapper.Error("The given API key is invalid. API key configuration is not updated.");
+            return;
+        }
+
+        configuration.ApiKey = apiKey;
+        ConsoleWrapper.Success("The API key has been updated.");
     }
 
     private int MakeModelSelection()
