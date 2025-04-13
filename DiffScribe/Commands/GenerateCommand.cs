@@ -27,13 +27,14 @@ public class GenerateCommand(IServiceProvider provider) : ICommand
         {
             return;
         }
-        
-        Console.WriteLine("Generating commit message based on your changes...");
 
+        ConsoleWrapper.ShowLoadingText("Generating commit message based on your changes");
+        
         var stagedDiffs = _gitRunner.GetStagedDiffs();
         
         var commitMessage = _commitGenerator.GenerateCommitMessage(stagedDiffs);
-        
+
+        Console.WriteLine();
         ConsoleWrapper.Success($"Generated commit message: {commitMessage}");
     }
 

@@ -95,4 +95,23 @@ public static class ConsoleWrapper
             }
         }
     }
+
+    public static void ShowLoadingText(string text)
+    {
+        Console.CursorVisible = false;
+        var ellipsisLimit = 3;
+        var numberOfDots = 0;
+
+        Task.Run(() =>
+        {
+            while (true)
+            {
+                numberOfDots = numberOfDots % ellipsisLimit + 1;
+                var dots = new string('.', numberOfDots);
+                var padding = new string(' ', ellipsisLimit);
+                Console.Write($"\r{text}{dots}{padding}");
+                Thread.Sleep(500);
+            }
+        });
+    }
 }
