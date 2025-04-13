@@ -20,6 +20,11 @@ public static class ConsoleWrapper
         Console.WriteLine(line);
     }
     
+    public static void Info(string line)
+    {
+        Console.WriteLine($"\u2139 {line}");
+    }
+    
     public static void Success(string line)
     {
         Console.ForegroundColor = ConsoleColor.Green;

@@ -2,6 +2,7 @@ using DiffScribe.AI;
 using DiffScribe.Commands.Models;
 using DiffScribe.Git;
 using Microsoft.Extensions.DependencyInjection;
+using TextCopy;
 
 namespace DiffScribe.Commands;
 
@@ -33,9 +34,10 @@ public class GenerateCommand(IServiceProvider provider) : ICommand
         var stagedDiffs = _gitRunner.GetStagedDiffs();
         
         var commitMessage = _commitGenerator.GenerateCommitMessage(stagedDiffs);
-
-        Console.WriteLine();
-        ConsoleWrapper.Success($"Generated commit message: {commitMessage}");
+        
+        PrintPostGeneration(commitMessage);
+        
+        CopyToClipboardAndInform(commitMessage);
     }
 
     private bool ValidateVersionControl()
@@ -59,5 +61,18 @@ public class GenerateCommand(IServiceProvider provider) : ICommand
         }
 
         return true;
+    }
+
+    private void PrintPostGeneration(string commitMessage)
+    {
+        Console.WriteLine();
+        ConsoleWrapper.Success($"Generated commit message: {commitMessage}");
+    }
+
+    private void CopyToClipboardAndInform(string commitMessage)
+    {
+        ClipboardService.SetText(commitMessage);
+        Console.WriteLine();
+        ConsoleWrapper.Info("Commit message is copied to clipboard!");
     }
 }
