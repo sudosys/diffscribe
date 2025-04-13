@@ -1,5 +1,6 @@
 using DiffScribe.AI;
 using DiffScribe.Commands.Models;
+using DiffScribe.Configuration;
 using DiffScribe.Git;
 using Microsoft.Extensions.DependencyInjection;
 using TextCopy;
@@ -19,13 +20,19 @@ public class GenerateCommand(IServiceProvider provider) : ICommand
         ];
     
     private readonly GitRunner _gitRunner = provider.GetRequiredService<GitRunner>();
-    
     private readonly CommitGenerator _commitGenerator = provider.GetRequiredService<CommitGenerator>();
+    private readonly ConfigHandler _configHandler = provider.GetRequiredService<ConfigHandler>();
     
     public void Execute(Dictionary<string, object?> args)
     {
         if (!ValidateVersionControl())
         {
+            return;
+        }
+
+        if (!_configHandler.IsApiKeySet())
+        {
+            ConsoleWrapper.Error("API key must be set in order to generate a commit message.");
             return;
         }
 

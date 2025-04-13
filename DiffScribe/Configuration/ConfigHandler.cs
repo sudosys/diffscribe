@@ -130,4 +130,6 @@ public class ConfigHandler
         JsonSerializer.Deserialize<ToolConfiguration>(serialized, _serializerOptions)!;
 
     private void WriteToFile(string serializedConfig) => File.WriteAllText(ConfigFilePath, serializedConfig);
+
+    public bool IsApiKeySet() => !string.IsNullOrEmpty(Configuration.ApiKey);
 }
