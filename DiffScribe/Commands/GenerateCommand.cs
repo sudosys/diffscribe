@@ -36,11 +36,7 @@ public class GenerateCommand(IServiceProvider provider) : ICommand
             return;
         }
 
-        ConsoleWrapper.ShowLoadingText("Generating commit message based on your changes");
-        
-        var stagedDiffs = _gitRunner.GetStagedDiffs();
-        
-        var commitMessage = _commitGenerator.GenerateCommitMessage(stagedDiffs);
+        var commitMessage = GenerateCommitMessage();
         
         PrintPostGeneration(commitMessage);
         
@@ -68,6 +64,15 @@ public class GenerateCommand(IServiceProvider provider) : ICommand
         }
 
         return true;
+    }
+
+    private string GenerateCommitMessage()
+    {
+        ConsoleWrapper.ShowLoadingText("Generating commit message based on your changes");
+        
+        var stagedDiffs = _gitRunner.GetStagedDiffs();
+        
+        return _commitGenerator.GenerateCommitMessage(stagedDiffs);
     }
 
     private void PrintPostGeneration(string commitMessage)
