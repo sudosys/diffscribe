@@ -42,6 +42,15 @@ public class GitRunner
         return output ?? string.Empty;
     }
 
+    public bool Commit(string commitMessage)
+    {
+        using var process = Execute("git", $"commit -m \"{commitMessage}\"");
+        
+        var error = process?.StandardError.ReadToEnd();
+        
+        return string.IsNullOrEmpty(error);
+    }
+
     private Process? Execute(string command, params string[] arguments)
     {
         var startInfo = new ProcessStartInfo

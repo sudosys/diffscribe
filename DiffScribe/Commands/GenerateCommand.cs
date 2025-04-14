@@ -13,6 +13,8 @@ public class GenerateCommand(IServiceProvider provider) : ICommand
 
     public string Description => "Generate a commit title based on the staged changes and desired commit structure.";
 
+    private const string AutoCommitArg = "--auto-commit";
+    
     public CommandArgument[] DefinedArguments => 
         [
             new(AutoCommitArg, "Commit automatically after generation", typeof(bool), optional: true),
@@ -39,7 +41,12 @@ public class GenerateCommand(IServiceProvider provider) : ICommand
         
         PrintPostGeneration(commitMessage);
         
-        CopyToClipboard(commitMessage);
+        var autoCommitted = HandleAutoCommit(commitMessage, args);
+
+        if (!autoCommitted)
+        {
+            CopyToClipboard(commitMessage);
+        }
     }
 
     private bool ValidateVersionControl()
@@ -91,5 +98,28 @@ public class GenerateCommand(IServiceProvider provider) : ICommand
         ClipboardService.SetText(commitMessage);
         Console.WriteLine();
         ConsoleWrapper.Info("Commit message is copied to clipboard!");
+    }
+
+    private bool HandleAutoCommit(string commitMessage, Dictionary<string, object?> args)
+    {
+        if (!args.TryGetValue(AutoCommitArg, out _)
+            && !_configHandler.Configuration.AutoCommit)
+        {
+            return false;
+        }
+        
+        var proceed = 
+            ConsoleWrapper.ShowConfirmation("Proceed to commit your changes with the message above?");
+            
+        if (proceed)
+        {
+            var success = _gitRunner.Commit(commitMessage);
+            if (success)
+            {
+                ConsoleWrapper.Success("Changes are committed.");
+            }
+        }
+        
+        return proceed;
     }
 }

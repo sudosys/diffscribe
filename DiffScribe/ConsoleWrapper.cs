@@ -124,6 +124,23 @@ public static class ConsoleWrapper
                 
                 Thread.Sleep(500);
             }
-        });
+        }, cancellationToken);
+    }
+
+    public static bool ShowConfirmation(string text)
+    {
+        Console.Write($"{text} [y/N]: ");
+
+        var input = Console.ReadLine();
+
+        switch (input?.ToLower())
+        {
+            case "y":
+                return true;
+            case "n" or "":
+                return false;
+            default:
+                return ShowConfirmation(text);
+        }
     }
 }
