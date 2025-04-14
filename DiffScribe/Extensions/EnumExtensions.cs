@@ -1,6 +1,6 @@
 using DiffScribe.Configuration;
 
-namespace DiffScribe;
+namespace DiffScribe.Extensions;
 
 public static class EnumExtensions
 {

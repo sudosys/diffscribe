@@ -1,6 +1,6 @@
 using System.Text.RegularExpressions;
 
-namespace DiffScribe;
+namespace DiffScribe.Extensions;
 
 public static class RegexExtensions
 {
