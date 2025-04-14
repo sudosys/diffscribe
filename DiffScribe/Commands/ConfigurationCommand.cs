@@ -82,9 +82,7 @@ public class ConfigurationCommand(IServiceProvider provider) : ICommand
 
     private int MakeModelSelection()
     {
-        var models = Enum.GetValues<LlmModel>()
-            .Select(v => v.ToApiName())
-            .ToImmutableArray();
+        var models = EnumExtensions.CreateSelectionList<LlmModel>();
         
         var selectedIdx = ConsoleWrapper.ShowSelectionList(models, "Select a model for generation then press ENTER");
         return selectedIdx;

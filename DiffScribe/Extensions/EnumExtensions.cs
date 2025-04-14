@@ -1,4 +1,5 @@
-using DiffScribe.Configuration;
+using System.Collections.Immutable;
+using DiffScribe.Configuration.Enums;
 
 namespace DiffScribe.Extensions;
 
@@ -11,4 +12,9 @@ public static class EnumExtensions
         LlmModel.Gpt4oMini => "gpt-4o-mini",
         _ => throw new ArgumentOutOfRangeException(nameof(model))
     };
+
+    public static ImmutableArray<string> CreateSelectionList<T>() where T : struct, Enum
+    {
+        return [..Enum.GetValues<T>().Select(v => v.ToString())];
+    }
 }
