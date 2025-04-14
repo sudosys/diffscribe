@@ -67,11 +67,17 @@ public class GenerateCommand(IServiceProvider provider) : ICommand
 
     private string GenerateCommitMessage()
     {
-        ConsoleWrapper.ShowLoadingText("Generating commit message based on your changes");
+        var source = new CancellationTokenSource();
+        
+        ConsoleWrapper.ShowLoadingText("Generating commit message based on your changes", source.Token);
         
         var stagedDiffs = _gitRunner.GetStagedDiffs();
         
-        return _commitGenerator.GenerateCommitMessage(stagedDiffs);
+        var commitMessage =  _commitGenerator.GenerateCommitMessage(stagedDiffs);
+
+        source.Cancel();
+        
+        return commitMessage;
     }
 
     private void PrintPostGeneration(string commitMessage)

@@ -101,7 +101,7 @@ public static class ConsoleWrapper
         }
     }
 
-    public static void ShowLoadingText(string text)
+    public static void ShowLoadingText(string text, CancellationToken cancellationToken)
     {
         Console.CursorVisible = false;
         var ellipsisLimit = 3;
@@ -111,10 +111,17 @@ public static class ConsoleWrapper
         {
             while (true)
             {
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    Console.CursorVisible = true;
+                    break;
+                }
+                
                 numberOfDots = numberOfDots % ellipsisLimit + 1;
                 var dots = new string('.', numberOfDots);
                 var padding = new string(' ', ellipsisLimit);
                 Console.Write($"\r{text}{dots}{padding}");
+                
                 Thread.Sleep(500);
             }
         });
