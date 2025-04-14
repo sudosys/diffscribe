@@ -1,8 +1,8 @@
 namespace DiffScribe.Configuration;
 
-public class ToolConfiguration(string commitStructure, bool autoCommit, string apiKey, string llm)
+public class ToolConfiguration(string commitStyle, bool autoCommit, string apiKey, string llm)
 {
-    public string CommitStructure { get; set; } = commitStructure;
+    public string CommitStyle { get; set; } = commitStyle;
     
     public bool AutoCommit { get; set; } = autoCommit;
     

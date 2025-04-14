@@ -1,4 +1,3 @@
-using System.Collections.Immutable;
 using DiffScribe.AI;
 using DiffScribe.Commands.Models;
 using DiffScribe.Configuration;
@@ -14,14 +13,14 @@ public class ConfigurationCommand(IServiceProvider provider) : ICommand
     
     public string Description => "Display & edit tool configuration.";
     
-    private const string CommitStructureArg = "--commit-structure";
+    private const string CommitStyleArg = "--commit-style";
     private const string ApiKeyArg = "--api-key";
     private const string LlmArg = "--llm";
     private const string AutoCommitArg = "--auto-commit";
 
     public CommandArgument[] DefinedArguments => 
         [
-            new(CommitStructureArg, "Set the commit structure to shape the generated title.", typeof(string), optional: true),
+            new(CommitStyleArg, "Set the commit style to specify the verbosity of the commit message.", typeof(void), optional: true),
             new(ApiKeyArg, "Set the OpenAI API key.", typeof(string), optional: true),
             new(LlmArg, "Select the OpenAI model to be used for generation.", typeof(void), optional: true),
             new(AutoCommitArg, "Commit automatically after generation.", typeof(bool), optional: true),
@@ -44,9 +43,12 @@ public class ConfigurationCommand(IServiceProvider provider) : ICommand
         {
             switch (arg)
             {
-                case CommitStructureArg when value is not null:
-                    toolConfig.CommitStructure = value.ToString()!;
+                case CommitStyleArg:
+                {
+                    var selectedIdx = MakeCommitStyleSelection();
+                    toolConfig.CommitStyle = ((CommitStyle)selectedIdx).ToString();
                     break;
+                }
                 case ApiKeyArg when value is not null:
                     UpdateApiKey(ref toolConfig, value.ToString()!);
                     break;
@@ -54,9 +56,11 @@ public class ConfigurationCommand(IServiceProvider provider) : ICommand
                     toolConfig.AutoCommit = (bool)value;
                     break;
                 case LlmArg:
+                {
                     var selectedIdx = MakeModelSelection();
                     toolConfig.Llm = ((LlmModel)selectedIdx).ToApiName();
                     break;
+                }
             }
         }
         
@@ -67,6 +71,15 @@ public class ConfigurationCommand(IServiceProvider provider) : ICommand
     {
         _configHandler.TryCreateConfigFile();
         _configHandler.ReadConfigFile();
+    }
+
+    private int MakeCommitStyleSelection()
+    {
+        var styles = EnumExtensions.CreateSelectionList<CommitStyle>();
+        
+        var selectedIdx = ConsoleWrapper.ShowSelectionList(styles, title: "Select a commit style that fits your needs, then press ENTER.");
+        
+        return selectedIdx;
     }
 
     private void UpdateApiKey(ref ToolConfiguration configuration, string apiKey)
