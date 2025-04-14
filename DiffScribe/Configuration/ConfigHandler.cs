@@ -34,7 +34,7 @@ public class ConfigHandler
         table.Write(Format.Minimal);
     }
     
-    public ToolConfiguration GetConfigurationFromFile()
+    private ToolConfiguration GetConfigurationFromFile()
     {
         var serialized = string.Empty;
         try
