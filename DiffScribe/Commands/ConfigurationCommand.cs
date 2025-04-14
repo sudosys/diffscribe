@@ -53,9 +53,6 @@ public class ConfigurationCommand(IServiceProvider provider) : ICommand
                 case AutoCommitArg when value is not null:
                     toolConfig.AutoCommit = (bool)value;
                     break;
-                case AutoPushArg when value is not null:
-                    toolConfig.AutoPush = (bool)value;
-                    break;
                 case LlmArg:
                     var selectedIdx = MakeModelSelection();
                     toolConfig.Llm = ((LlmModel)selectedIdx).ToApiName();

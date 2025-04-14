@@ -116,7 +116,6 @@ public class ConfigHandler
         return new ToolConfiguration(
             commitStructure: string.Empty,
             autoCommit: false,
-            autoPush: false,
             apiKey: string.Empty,
             llm: LlmModel.Gpt4oMini.ToApiName());
     }

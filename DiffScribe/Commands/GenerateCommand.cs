@@ -15,8 +15,7 @@ public class GenerateCommand(IServiceProvider provider) : ICommand
 
     public CommandArgument[] DefinedArguments => 
         [
-            new("--auto-commit", "Commit automatically after generation", typeof(bool), optional: true),
-            new("--auto-push", "Commit & push automatically after generation", typeof(bool), optional: true)
+            new(AutoCommitArg, "Commit automatically after generation", typeof(bool), optional: true),
         ];
     
     private readonly GitRunner _gitRunner = provider.GetRequiredService<GitRunner>();
