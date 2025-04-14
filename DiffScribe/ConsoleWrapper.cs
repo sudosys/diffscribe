@@ -104,7 +104,7 @@ public static class ConsoleWrapper
     public static void ShowLoadingText(string text, CancellationToken cancellationToken)
     {
         Console.CursorVisible = false;
-        var ellipsisLimit = 3;
+        const int ellipsisLimit = 3;
         var numberOfDots = 0;
 
         Task.Run(() =>
