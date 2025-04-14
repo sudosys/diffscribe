@@ -22,7 +22,7 @@ public static class ConsoleWrapper
     
     public static void Info(string line)
     {
-        Console.WriteLine($"\u2139 {line}");
+        Console.WriteLine($"\u2139\uFE0F {line}");
     }
     
     public static void Success(string line)
