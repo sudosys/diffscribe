@@ -90,13 +90,12 @@ public class GenerateCommand(IServiceProvider provider) : ICommand
     private void PrintPostGeneration(string commitMessage)
     {
         Console.WriteLine();
-        ConsoleWrapper.Success($"Generated commit message: {commitMessage}");
+        ConsoleWrapper.Success($"Generated commit message: \n---\n{commitMessage}\n---\n");
     }
 
     private void CopyToClipboard(string commitMessage)
     {
         ClipboardService.SetText(commitMessage);
-        Console.WriteLine();
         ConsoleWrapper.Info("Commit message is copied to clipboard!");
     }
 
