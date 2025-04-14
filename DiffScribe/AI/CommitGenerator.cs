@@ -1,4 +1,5 @@
 using DiffScribe.Configuration;
+using DiffScribe.Configuration.Enums;
 using OpenAI.Chat;
 
 namespace DiffScribe.AI;

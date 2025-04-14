@@ -1,6 +1,7 @@
 using System.Reflection;
 using System.Text.Json;
 using ConsoleTables;
+using DiffScribe.Configuration.Enums;
 using DiffScribe.Extensions;
 
 namespace DiffScribe.Configuration;

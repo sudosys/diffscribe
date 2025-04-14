@@ -2,6 +2,7 @@ using System.Collections.Immutable;
 using DiffScribe.AI;
 using DiffScribe.Commands.Models;
 using DiffScribe.Configuration;
+using DiffScribe.Configuration.Enums;
 using DiffScribe.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 

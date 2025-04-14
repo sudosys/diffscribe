@@ -1,4 +1,4 @@
-namespace DiffScribe.Configuration;
+namespace DiffScribe.Configuration.Enums;
 
 public enum LlmModel
 {
