@@ -33,5 +33,5 @@ public class OpenAiClient(ConfigHandler configHandler)
     }
 
     private ChatClient GetClient(string? apiKey = null) => 
-        new(model: configHandler.Configuration.Llm, apiKey: apiKey ?? configHandler.Configuration.ApiKey);
+        new(model: configHandler.Configuration.Llm, apiKey: apiKey ?? configHandler.ReadApiKey());
 }

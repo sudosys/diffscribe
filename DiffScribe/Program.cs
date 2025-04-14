@@ -1,5 +1,6 @@
 ﻿using DiffScribe.AI;
 using DiffScribe.Configuration;
+using DiffScribe.Encryption;
 using DiffScribe.Git;
 using DiffScribe.Parser;
 using Microsoft.Extensions.DependencyInjection;
@@ -31,7 +32,9 @@ class Program
             .AddSingleton<ConfigHandler>()
             .AddSingleton<GitRunner>()
             .AddScoped<OpenAiClient>()
-            .AddSingleton<CommitGenerator>();
+            .AddSingleton<CommitGenerator>()
+            .AddSingleton<EncryptionService>()
+            .AddSingleton<AppConfiguration>();
         
         return serviceCollection;
     }

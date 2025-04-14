@@ -2,6 +2,7 @@ using System.Reflection;
 using System.Text.Json;
 using ConsoleTables;
 using DiffScribe.Configuration.Enums;
+using DiffScribe.Encryption;
 using DiffScribe.Extensions;
 
 namespace DiffScribe.Configuration;
@@ -25,7 +26,15 @@ public class ConfigHandler
     private const int MaxValueColumnWidth = 25; 
     private const string NotSetValuePlaceHolder = "<NOT SET>";
 
-    public ToolConfiguration Configuration => GetConfigurationFromFile();
+    public ToolConfiguration Configuration { get; }
+
+    private readonly EncryptionService _encryptionService;
+
+    public ConfigHandler(EncryptionService encryptionService)
+    {
+        Configuration = GetConfigurationFromFile();
+        _encryptionService = encryptionService ?? throw new ArgumentNullException(nameof(encryptionService));
+    }
 
     public void ReadConfigFile()
     {
@@ -121,8 +130,20 @@ public class ConfigHandler
             apiKey: string.Empty,
             llm: LlmModel.Gpt4oMini.ToApiName());
     }
-    
-    public void UpdateConfiguration(ToolConfiguration toolConfig) => WriteToFile(Serialize(toolConfig));
+
+    #region API Key
+    public void UpdateApiKey(string apiKey)
+    {
+        var encrypted = _encryptionService.EncryptText(apiKey);
+        
+        Configuration.ApiKey = encrypted;
+    }
+
+    public string ReadApiKey() 
+        => _encryptionService.DecryptText(Configuration.ApiKey);
+    #endregion
+
+    public void UpdateConfiguration() => WriteToFile(Serialize(Configuration));
 
     private string Serialize(ToolConfiguration toolConfiguration) => 
         JsonSerializer.Serialize(toolConfiguration, _serializerOptions);

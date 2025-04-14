@@ -49,8 +49,8 @@ public class ConfigurationCommand(IServiceProvider provider) : ICommand
                     toolConfig.CommitStyle = ((CommitStyle)selectedIdx).ToString();
                     break;
                 }
-                case ApiKeyArg when value is not null:
-                    UpdateApiKey(ref toolConfig, value.ToString()!);
+                case ApiKeyArg:
+                    UpdateApiKey(value!.ToString()!);
                     break;
                 case AutoCommitArg when value is not null:
                     toolConfig.AutoCommit = (bool)value;
@@ -64,7 +64,7 @@ public class ConfigurationCommand(IServiceProvider provider) : ICommand
             }
         }
         
-        _configHandler.UpdateConfiguration(toolConfig);
+        _configHandler.UpdateConfiguration();
     }
 
     private void ShowCurrentConfiguration()
@@ -82,7 +82,7 @@ public class ConfigurationCommand(IServiceProvider provider) : ICommand
         return selectedIdx;
     }
 
-    private void UpdateApiKey(ref ToolConfiguration configuration, string apiKey)
+    private void UpdateApiKey(string apiKey)
     {
         if (!_openAiClient.TestApiKeyValidity(apiKey))
         {
@@ -90,7 +90,8 @@ public class ConfigurationCommand(IServiceProvider provider) : ICommand
             return;
         }
 
-        configuration.ApiKey = apiKey;
+        _configHandler.UpdateApiKey(apiKey);
+        
         ConsoleWrapper.Success("The API key has been updated.");
     }
 
