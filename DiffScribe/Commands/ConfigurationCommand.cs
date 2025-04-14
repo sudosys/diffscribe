@@ -17,7 +17,6 @@ public class ConfigurationCommand(IServiceProvider provider) : ICommand
     private const string ApiKeyArg = "--api-key";
     private const string LlmArg = "--llm";
     private const string AutoCommitArg = "--auto-commit";
-    private const string AutoPushArg = "--auto-push";
 
     public CommandArgument[] DefinedArguments => 
         [
@@ -25,7 +24,6 @@ public class ConfigurationCommand(IServiceProvider provider) : ICommand
             new(ApiKeyArg, "Set the OpenAI API key.", typeof(string), optional: true),
             new(LlmArg, "Select the OpenAI model to be used for generation.", typeof(void), optional: true),
             new(AutoCommitArg, "Commit automatically after generation.", typeof(bool), optional: true),
-            new(AutoPushArg, "Commit & push automatically after generation.", typeof(bool), optional: true)
         ];
     
     private readonly ConfigHandler _configHandler = provider.GetRequiredService<ConfigHandler>();
