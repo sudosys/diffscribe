@@ -39,8 +39,7 @@ public class ConfigurationCommand(IServiceProvider provider) : ICommand
             return;
         }
         
-        var toolConfig = _configHandler.GetConfigurationFromFile();
-
+        var toolConfig = _configHandler.Configuration;
         foreach (var (arg, value) in args)
         {
             switch (arg)
