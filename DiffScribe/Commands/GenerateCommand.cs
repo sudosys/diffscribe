@@ -40,7 +40,7 @@ public class GenerateCommand(IServiceProvider provider) : ICommand
         
         PrintPostGeneration(commitMessage);
         
-        CopyToClipboardAndInform(commitMessage);
+        CopyToClipboard(commitMessage);
     }
 
     private bool ValidateVersionControl()
@@ -81,7 +81,7 @@ public class GenerateCommand(IServiceProvider provider) : ICommand
         ConsoleWrapper.Success($"Generated commit message: {commitMessage}");
     }
 
-    private void CopyToClipboardAndInform(string commitMessage)
+    private void CopyToClipboard(string commitMessage)
     {
         ClipboardService.SetText(commitMessage);
         Console.WriteLine();
