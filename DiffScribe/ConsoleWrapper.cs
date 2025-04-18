@@ -104,27 +104,41 @@ public static class ConsoleWrapper
     public static void ShowLoadingText(string text, CancellationToken cancellationToken)
     {
         Console.CursorVisible = false;
-        const int ellipsisLimit = 3;
-        var numberOfDots = 0;
 
-        Task.Run(() =>
+        Task.Run(async () =>
         {
-            while (true)
+            try
+            {
+                await StartLoadingTextLoop(text, cancellationToken);
+            }
+            finally
             {
                 if (cancellationToken.IsCancellationRequested)
                 {
                     Console.CursorVisible = true;
-                    break;
                 }
-                
-                numberOfDots = numberOfDots % ellipsisLimit + 1;
-                var dots = new string('.', numberOfDots);
-                var padding = new string(' ', ellipsisLimit);
-                Console.Write($"\r{text}{dots}{padding}");
-                
-                Thread.Sleep(500);
             }
         }, cancellationToken);
+    }
+
+    private static async Task StartLoadingTextLoop(string text, CancellationToken cancellationToken)
+    {        
+        const int ellipsisLimit = 3;
+        var numberOfDots = 0;
+        while (true)
+        {
+            numberOfDots = numberOfDots % ellipsisLimit + 1;
+            var dots = new string('.', numberOfDots);
+            var padding = new string(' ', ellipsisLimit);
+            Console.Write($"\r{text}{dots}{padding}");
+
+            await Task.Delay(500, cancellationToken);
+
+            if (cancellationToken.IsCancellationRequested)
+            {
+                break;
+            }
+        }
     }
 
     public static bool ShowConfirmation(string text)
