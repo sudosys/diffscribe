@@ -9,7 +9,8 @@ public class CommandDispatcher(ArgumentValidator argumentValidator, IServiceProv
     {
         { "root", new RootCommand() },
         { "generate", new GenerateCommand(provider) },
-        { "config", new ConfigurationCommand(provider) }
+        { "config", new ConfigurationCommand(provider) },
+        { "reset", new ResetCommand(provider) },
     };
     
     public void Dispatch(CommandInfo commandInfo)

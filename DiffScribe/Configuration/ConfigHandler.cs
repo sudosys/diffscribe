@@ -104,6 +104,13 @@ public class ConfigHandler
 
         return $"{value[..maxLength]}{(truncated ? "..." : string.Empty)}";
     }
+    
+    public void ResetConfiguration()
+    {
+        File.Delete(ConfigFilePath);
+        
+        TryCreateConfigFile();
+    }
 
     public void TryCreateConfigFile()
     {
