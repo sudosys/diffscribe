@@ -70,7 +70,7 @@ public class ConfigurationCommand(IServiceProvider provider) : ICommand
     private void ShowCurrentConfiguration()
     {
         _configHandler.TryCreateConfigFile();
-        _configHandler.ReadConfigFile();
+        _configHandler.PrintCurrentConfigAsTable();
     }
 
     private int MakeCommitStyleSelection()

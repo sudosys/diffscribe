@@ -32,18 +32,11 @@ public class ConfigHandler
 
     public ConfigHandler(EncryptionService encryptionService)
     {
-        Configuration = GetConfigurationFromFile();
+        Configuration = ReadConfiguration();
         _encryptionService = encryptionService ?? throw new ArgumentNullException(nameof(encryptionService));
     }
-
-    public void ReadConfigFile()
-    {
-        var table = CreateConfigurationInformation();
-        
-        table.Write(Format.Minimal);
-    }
     
-    private ToolConfiguration GetConfigurationFromFile()
+    private ToolConfiguration ReadConfiguration()
     {
         var serialized = string.Empty;
         try
@@ -64,11 +57,16 @@ public class ConfigHandler
         {
             ConsoleWrapper.Warning("Configuration not found. Creating default configuration file.");
             TryCreateConfigFile();
-
-            ReadConfigFile();
         }
     }
 
+    public void PrintCurrentConfigAsTable()
+    {
+        var table = CreateConfigurationInformation();
+        
+        table.Write(Format.Minimal);
+    }
+    
     private ConsoleTable CreateConfigurationInformation()
     {
         var type = Configuration.GetType();
