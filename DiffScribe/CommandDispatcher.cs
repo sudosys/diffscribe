@@ -18,12 +18,10 @@ public class CommandDispatcher(ArgumentValidator argumentValidator, IServiceProv
     public void Dispatch(CommandInfo commandInfo)
     {
         if (_commandMappings.TryGetValue(commandInfo.Name, out var command) 
-            && DoesDefinedCommandNameMatch(commandInfo.Name, command.Name))
+            && DoesDefinedCommandNameMatch(commandInfo.Name, command.Name)
+            && argumentValidator.Validate(command.DefinedArguments, commandInfo.Arguments))
         {
-            if (argumentValidator.Validate(command.DefinedArguments, commandInfo.Arguments))
-            {
-                command.Execute(commandInfo.Arguments);
-            }
+            command.Execute(commandInfo.Arguments);
         }
         else
         {
