@@ -26,9 +26,9 @@ public class ConfigHandler
     private const int MaxValueColumnWidth = 25; 
     private const string NotSetValuePlaceHolder = "<NOT SET>";
 
-    public ToolConfiguration Configuration { get; }
-
     private readonly EncryptionService _encryptionService;
+    
+    public ToolConfiguration Configuration { get; }
 
     public ConfigHandler(EncryptionService encryptionService)
     {
@@ -150,13 +150,14 @@ public class ConfigHandler
 
     public void UpdateConfiguration() => WriteToFile(Serialize(Configuration));
 
-    private string Serialize(ToolConfiguration toolConfiguration) => 
-        JsonSerializer.Serialize(toolConfiguration, _serializerOptions);
+    private static void WriteToFile(string serializedConfig) 
+        => File.WriteAllText(ConfigFilePath, serializedConfig);
 
-    private ToolConfiguration Deserialize(string serialized) => 
-        JsonSerializer.Deserialize<ToolConfiguration>(serialized, _serializerOptions)!;
+    private string Serialize(ToolConfiguration toolConfiguration) 
+        => JsonSerializer.Serialize(toolConfiguration, _serializerOptions);
 
-    private void WriteToFile(string serializedConfig) => File.WriteAllText(ConfigFilePath, serializedConfig);
-
+    private ToolConfiguration Deserialize(string serialized) 
+        => JsonSerializer.Deserialize<ToolConfiguration>(serialized, _serializerOptions)!;
+    
     public bool IsApiKeySet() => !string.IsNullOrEmpty(Configuration.ApiKey);
 }
