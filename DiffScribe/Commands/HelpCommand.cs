@@ -72,11 +72,17 @@ public class HelpCommand : ICommand
             return;
         }
         
-        var table = CreateCommandTable(cmd);
-        
         Console.WriteLine($"{cmd.Name}: {cmd.Description}\n");
-        
-        table.Write(Format.Minimal);
+
+        if (cmd.DefinedArguments.Length > 0)
+        {
+            var table = CreateCommandTable(cmd);
+            table.Write(Format.Minimal);
+        }
+        else
+        {
+            ConsoleWrapper.Info("This command doesn't have any arguments.");
+        }
     }
     
     private string ParseCmdName(string argument) => argument.TrimStart('-');
