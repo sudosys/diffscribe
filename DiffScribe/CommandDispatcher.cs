@@ -1,25 +1,13 @@
-using DiffScribe.Commands;
 using DiffScribe.Parser;
 
 namespace DiffScribe;
 
-public class CommandDispatcher(ArgumentValidator argumentValidator, IServiceProvider provider)
+public class CommandDispatcher(ArgumentValidator argumentValidator, CommandMatcher commandMatcher)
 {
-    private readonly Dictionary<string, ICommand> _commandMappings = new()
-    {
-        { "root", new RootCommand() },
-        { "generate", new GenerateCommand(provider) },
-        { "g", new GenerateCommand(provider) },
-        { "config", new ConfigurationCommand(provider) },
-        { "c", new ConfigurationCommand(provider) },
-        { "reset", new ResetCommand(provider) },
-    };
-    
     public void Dispatch(CommandInfo commandInfo)
     {
-        if (_commandMappings.TryGetValue(commandInfo.Name, out var command) 
-            && DoesDefinedCommandNameMatch(commandInfo.Name, command.Name)
-            && argumentValidator.Validate(command.DefinedArguments, commandInfo.Arguments))
+        if (commandMatcher.TryMatch(commandInfo.Name, out var command)
+            && argumentValidator.Validate(command!.DefinedArguments, commandInfo.Arguments))
         {
             command.Execute(commandInfo.Arguments);
         }
@@ -28,7 +16,4 @@ public class CommandDispatcher(ArgumentValidator argumentValidator, IServiceProv
             ConsoleWrapper.Error($"Unknown command: {commandInfo.Name}");
         }
     }
-
-    private static bool DoesDefinedCommandNameMatch(string input, string commandName) 
-        => string.Equals(input, commandName) || commandName.StartsWith(input);
 }

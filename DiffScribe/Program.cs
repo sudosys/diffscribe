@@ -28,6 +28,7 @@ class Program
         serviceCollection
             .AddSingleton<CommandParser>()
             .AddSingleton<CommandDispatcher>()
+            .AddSingleton<CommandMatcher>()
             .AddSingleton<ArgumentValidator>()
             .AddSingleton<ConfigHandler>()
             .AddSingleton<GitRunner>()
