@@ -2,24 +2,30 @@ using DiffScribe.Commands;
 
 namespace DiffScribe;
 
-public class CommandMatcher(IServiceProvider provider)
+public class CommandMatcher
 {
-    private readonly Dictionary<string, ICommand> _commandMappings = new()
+    private readonly Dictionary<string, Lazy<ICommand>> _commandMappings;
+
+    public CommandMatcher(IServiceProvider provider)
     {
-        { "root", new RootCommand() },
-        { "generate", new GenerateCommand(provider) },
-        { "g", new GenerateCommand(provider) },
-        { "config", new ConfigurationCommand(provider) },
-        { "c", new ConfigurationCommand(provider) },
-        { "reset", new ResetCommand(provider) },
-    };
+        _commandMappings = new Dictionary<string, Lazy<ICommand>>
+        {
+            { "root", new Lazy<ICommand>(() => new RootCommand()) },
+            { "generate", new Lazy<ICommand>(() => new GenerateCommand(provider)) },
+            { "g", new Lazy<ICommand>(() => new GenerateCommand(provider)) },
+            { "config", new Lazy<ICommand>(() => new ConfigurationCommand(provider)) },
+            { "c", new Lazy<ICommand>(() => new ConfigurationCommand(provider)) },
+            { "reset", new Lazy<ICommand>(() => new ResetCommand(provider)) },
+            { "help", new Lazy<ICommand>(() => new HelpCommand(this)) }
+        };
+    }
 
     public bool TryMatch(string commandName, out ICommand? command)
     {
         if (_commandMappings.TryGetValue(commandName, out var cmd) 
-            && DoesNameMatch(commandName, cmd.Name))
+            && DoesNameMatch(commandName, cmd.Value.Name))
         {
-            command = cmd;
+            command = cmd.Value;
             return true;
         }
         
