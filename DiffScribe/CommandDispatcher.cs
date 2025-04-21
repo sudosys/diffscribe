@@ -6,10 +6,12 @@ public class CommandDispatcher(ArgumentValidator argumentValidator, CommandMatch
 {
     public void Dispatch(CommandInfo commandInfo)
     {
-        if (commandMatcher.TryMatch(commandInfo.Name, out var command)
-            && argumentValidator.Validate(command!.DefinedArguments, commandInfo.Arguments))
+        if (commandMatcher.TryMatch(commandInfo.Name, out var command) && command != null)
         {
-            command.Execute(commandInfo.Arguments);
+            if (argumentValidator.Validate(command.DefinedArguments, commandInfo.Arguments))
+            {
+                command.Execute(commandInfo.Arguments);
+            }
         }
         else
         {
