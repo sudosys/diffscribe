@@ -2,7 +2,7 @@ using DiffScribe.Commands.Models;
 
 namespace DiffScribe.Commands;
 
-public class RootCommand : ICommand
+public class RootCommand(CommandMatcher commandMatcher) : ICommand
 {
     public string Name => "root";
 
@@ -10,8 +10,29 @@ public class RootCommand : ICommand
 
     public CommandArgument[] DefinedArguments => [];
     
-    public void Execute(Dictionary<string, object?> args)
+    public void Execute(Dictionary<string, object?> _)
     {
-        Console.WriteLine(Description);
+        PrintToolHeader();
+        RunHelpCommand();
+    }
+
+    private void PrintToolHeader() =>
+        Console.WriteLine("""
+                          >>========================================================================================<<
+                          || ██████████    ███    ██████ ██████ █████████                      ████████             ||
+                          ||░░███░░░░███  ░░░    ███░░█████░░█████░░░░░███                    ░░░░░███              ||
+                          || ░███   ░░███ ████  ░███ ░░░███ ░░░███    ░░░   ██████  ████████  ████░███████   ██████ ||
+                          || ░███    ░███░░███ ██████████████ ░░█████████  ███░░███░░███░░███░░███░███░░███ ███░░███||
+                          || ░███    ░███ ░███░░░███░░░░███░   ░░░░░░░░███░███ ░░░  ░███ ░░░  ░███░███ ░███░███████ ||
+                          || ░███    ███  ░███  ░███   ░███    ███    ░███░███  ███ ░███      ░███░███ ░███░███░░░  ||
+                          || ██████████   █████ █████  █████  ░░█████████ ░░██████  █████     ████████████ ░░██████ ||
+                          ||░░░░░░░░░░   ░░░░░ ░░░░░  ░░░░░    ░░░░░░░░░   ░░░░░░  ░░░░░     ░░░░░░░░░░░░   ░░░░░░  ||
+                          >>========================================================================================<<
+                          """);
+
+    private void RunHelpCommand()
+    {
+        var helpCmd = new HelpCommand(commandMatcher);
+        helpCmd.Execute(new Dictionary<string, object?>());
     }
 }

@@ -10,7 +10,7 @@ public class CommandMatcher
     {
         _commandMappings = new Dictionary<string, Lazy<ICommand>>
         {
-            { "root", new Lazy<ICommand>(() => new RootCommand()) },
+            { "root", new Lazy<ICommand>(() => new RootCommand(this)) },
             { "generate", new Lazy<ICommand>(() => new GenerateCommand(provider)) },
             { "g", new Lazy<ICommand>(() => new GenerateCommand(provider)) },
             { "config", new Lazy<ICommand>(() => new ConfigurationCommand(provider)) },
