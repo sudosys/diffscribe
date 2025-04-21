@@ -1,0 +1,95 @@
+using ConsoleTables;
+using DiffScribe.Commands.Models;
+
+namespace DiffScribe.Commands;
+
+public class HelpCommand : ICommand
+{
+    public string Name => "help";
+
+    public string Description => "Returns the intention of the command and its arguments in a table format.";
+    
+    public CommandArgument[] DefinedArguments { get; }
+    
+    private readonly CommandMatcher _commandMatcher;
+
+    public HelpCommand(CommandMatcher commandMatcher)
+    {
+        _commandMatcher = commandMatcher;
+        
+        DefinedArguments = _commandMatcher
+            .GetDefinedCommandNames()
+            .Select(cmd => new CommandArgument($"--{cmd}", string.Empty, typeof(void), optional: true))
+            .ToArray();
+    }
+    
+    public void Execute(Dictionary<string, object?> args)
+    {
+        switch (args.Count)
+        {
+            case 0:
+                PrintCommandList();
+                break;
+            case 1:
+                PrintCommandHelp(args.First().Key);
+                break;
+            case > 1:
+                ConsoleWrapper.Error("Provide a single command name to get help.");
+                break;
+        }
+    }
+
+    private void PrintCommandList()
+    {
+        var table = CreateCommandsTable();
+        table.Write(Format.Minimal);
+        
+        ConsoleWrapper.Info("To get help for a specific command: \"help --<command>\"");
+    }
+
+    private ConsoleTable CreateCommandsTable()
+    {
+        var table = new ConsoleTable("Command", "Description");
+        foreach (var arg in DefinedArguments)
+        {
+            _commandMatcher.TryMatch(ParseCmdName(arg.Name), out var cmd);
+
+            if (cmd is not null)
+            {
+                table.AddRow(cmd.Name, cmd.Description);
+            }
+        }
+
+        return table;
+    }
+
+    private void PrintCommandHelp(string arg)
+    {
+        var cmdName = ParseCmdName(arg);
+        if (!_commandMatcher.TryMatch(cmdName, out var cmd) || cmd is null)
+        {
+            ConsoleWrapper.Error($"No such command exists: \"{cmdName}\"");
+            return;
+        }
+        
+        var table = CreateCommandTable(cmd);
+        
+        Console.WriteLine($"{cmd.Name}: {cmd.Description}\n");
+        
+        table.Write(Format.Minimal);
+    }
+    
+    private string ParseCmdName(string argument) => argument.TrimStart('-');
+
+    private ConsoleTable CreateCommandTable(ICommand command)
+    {
+        var table = new ConsoleTable("Argument", "Description", "Type", "Optional");
+
+        foreach (var commandArg in command.DefinedArguments)
+        {
+            table.AddRow(commandArg.Name, commandArg.Description, commandArg.Type.Name, commandArg.Optional);
+        }
+        
+        return table;
+    }
+}

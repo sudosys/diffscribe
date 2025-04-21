@@ -35,4 +35,10 @@ public class CommandMatcher
     
     private static bool DoesNameMatch(string input, string commandName) 
         => string.Equals(input, commandName) || commandName.StartsWith(input);
+    
+    public string[] GetDefinedCommandNames() 
+        => _commandMappings.Keys
+            .Skip(1)
+            .Where(key => key.Length > 1)
+            .ToArray();
 }
