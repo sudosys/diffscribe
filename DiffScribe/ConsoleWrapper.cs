@@ -33,16 +33,18 @@ public static class ConsoleWrapper
         Console.WriteLine(line);
     }
 
-    public static int ShowSelectionList(ImmutableArray<string> options, string title = "Make a selection, then press ENTER")
+    public static int ShowSelectionList(ImmutableArray<string> options, string title)
     {
         ConsoleKeyInfo keyInfo;
         var selectionIdx = 0;
+        
+        var topText = $"{title}\nPress ENTER to select, Q to quit.";
         
         do
         {
             Console.Clear();
             
-            WriteLineNoColor(title);
+            WriteLineNoColor(topText);
 
             for (var i = 0; i < options.Length; i++)
             {
@@ -59,6 +61,11 @@ public static class ConsoleWrapper
             }
             
             keyInfo = Console.ReadKey(intercept: true);
+
+            if (keyInfo.Key == ConsoleKey.Q)
+            {
+                return -1;
+            }
 
             UpdateSelectionIdx(ref selectionIdx, options.Length, keyInfo.Key);
             
