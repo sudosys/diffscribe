@@ -23,5 +23,14 @@ public static class EnumExtensions
         LlmModel.Gpt4_1Nano => "GPT-4.1 nano",
         _ => throw new ArgumentOutOfRangeException(nameof(model))
     };
-
+        
+    public static string GetStats(this LlmModel model) => model switch
+    {
+        LlmModel.Gpt4o => $"Intelligence: {new string('\u2022', 3)}, Cost: {new string('\u2022', 5)}",
+        LlmModel.Gpt4oMini => $"Intelligence: {new string('\u2022', 2)}, Cost: {new string('\u2022', 2)}",
+        LlmModel.Gpt4_1 => $"Intelligence: {new string('\u2022', 4)}, Cost: {new string('\u2022', 4)}",
+        LlmModel.Gpt4_1Mini => $"Intelligence: {new string('\u2022', 3)}, Cost: {new string('\u2022', 3)}",
+        LlmModel.Gpt4_1Nano => $"Intelligence: {new string('\u2022', 2)}, Cost: {new string('\u2022', 1)}",
+        _ => throw new ArgumentOutOfRangeException(nameof(model))
+    };
 }

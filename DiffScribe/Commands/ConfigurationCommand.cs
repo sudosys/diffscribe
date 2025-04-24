@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using DiffScribe.AI;
 using DiffScribe.Commands.Models;
 using DiffScribe.Configuration;
@@ -27,8 +28,23 @@ public class ConfigurationCommand(IServiceProvider provider) : ICommand
         ];
     
     private readonly ConfigHandler _configHandler = provider.GetRequiredService<ConfigHandler>();
-    
     private readonly OpenAiClient _openAiClient = provider.GetRequiredService<OpenAiClient>();
+    
+    private readonly ImmutableArray<string> _commitStyleSelections =
+    [
+        $"{CommitStyle.Minimal} (Short, one-line commit title.)",
+        $"{CommitStyle.Standard} (Clear commit title with brief context.)",
+        $"{CommitStyle.Detailed} (Descriptive title followed by an in-depth explanation.)"
+    ];
+    
+    private readonly ImmutableArray<string> _llmSelections =
+    [
+        $"{LlmModel.Gpt4o.ToDisplayName()} ({LlmModel.Gpt4o.GetStats()})",
+        $"{LlmModel.Gpt4oMini.ToDisplayName()} ({LlmModel.Gpt4oMini.GetStats()})",
+        $"{LlmModel.Gpt4_1.ToDisplayName()} ({LlmModel.Gpt4_1.GetStats()})",
+        $"{LlmModel.Gpt4_1Mini.ToDisplayName()} ({LlmModel.Gpt4_1Mini.GetStats()})",
+        $"{LlmModel.Gpt4_1Nano.ToDisplayName()} ({LlmModel.Gpt4_1Nano.GetStats()})",
+    ];
 
     public void Execute(Dictionary<string, object?> args)
     {
@@ -44,11 +60,8 @@ public class ConfigurationCommand(IServiceProvider provider) : ICommand
             switch (arg)
             {
                 case CommitStyleArg:
-                {
-                    var selectedIdx = MakeCommitStyleSelection();
-                    toolConfig.CommitStyle = ((CommitStyle)selectedIdx).ToString();
+                    MakeCommitStyleSelection(ref toolConfig);
                     break;
-                }
                 case ApiKeyArg:
                     UpdateApiKey(value!.ToString()!);
                     break;
@@ -56,11 +69,8 @@ public class ConfigurationCommand(IServiceProvider provider) : ICommand
                     toolConfig.AutoCommit = (bool)value;
                     break;
                 case LlmArg:
-                {
-                    var selectedIdx = MakeModelSelection();
-                    toolConfig.Llm = ((LlmModel)selectedIdx).ToApiName();
+                    MakeModelSelection(ref toolConfig);
                     break;
-                }
             }
         }
         
@@ -73,13 +83,16 @@ public class ConfigurationCommand(IServiceProvider provider) : ICommand
         _configHandler.PrintCurrentConfigAsTable();
     }
 
-    private int MakeCommitStyleSelection()
+    private void MakeCommitStyleSelection(ref ToolConfiguration toolConfig)
     {
-        var styles = EnumExtensions.CreateSelectionList<CommitStyle>();
-        
-        var selectedIdx = ConsoleWrapper.ShowSelectionList(styles, title: "Select a commit style that fits your needs, then press ENTER.");
-        
-        return selectedIdx;
+        var selectedIdx = ConsoleWrapper.ShowSelectionList(
+            _commitStyleSelections,
+            title: "Select a commit style that fits your needs:");
+
+        if (selectedIdx != -1)
+        {
+            toolConfig.CommitStyle = ((CommitStyle)selectedIdx).ToString();
+        }
     }
 
     private void UpdateApiKey(string apiKey)
@@ -95,11 +108,15 @@ public class ConfigurationCommand(IServiceProvider provider) : ICommand
         ConsoleWrapper.Success("The API key has been updated.");
     }
 
-    private int MakeModelSelection()
+    private void MakeModelSelection(ref ToolConfiguration toolConfig)
     {
-        var models = EnumExtensions.CreateSelectionList<LlmModel>();
-        
-        var selectedIdx = ConsoleWrapper.ShowSelectionList(models, "Select a model for generation then press ENTER");
-        return selectedIdx;
+        var selectedIdx = ConsoleWrapper.ShowSelectionList(
+            _llmSelections,
+            title: "Select a model for commit title generation:");
+
+        if (selectedIdx != -1)
+        {
+            toolConfig.Llm = ((LlmModel)selectedIdx).ToApiName();
+        }
     }
 }
