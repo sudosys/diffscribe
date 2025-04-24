@@ -24,6 +24,7 @@ public class ConfigHandler
     };
 
     private const int MaxValueColumnWidth = 25; 
+    private const string SetValuePlaceHolder = "<SET>";
     private const string NotSetValuePlaceHolder = "<NOT SET>";
 
     private readonly EncryptionService _encryptionService;
@@ -85,14 +86,17 @@ public class ConfigHandler
     {
         var value = propertyInfo.GetValue(toolConfig);
 
-        if (value is string stringValue)
+        if (value is not string stringValue)
         {
-            return stringValue.Length == 0 ? 
-                NotSetValuePlaceHolder :
-                TryTruncateValue(stringValue);
+            return value?.ToString() ?? NotSetValuePlaceHolder;
         }
-        
-        return value?.ToString() ?? NotSetValuePlaceHolder;
+
+        return stringValue.Length switch
+        {
+            > 0 when propertyInfo.Name == nameof(toolConfig.ApiKey) => SetValuePlaceHolder,
+            > 0 => TryTruncateValue(stringValue),
+            _ => NotSetValuePlaceHolder
+        };
     }
 
     private string TryTruncateValue(string value)
