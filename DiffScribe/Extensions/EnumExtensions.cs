@@ -33,4 +33,18 @@ public static class EnumExtensions
         LlmModel.Gpt4_1Nano => $"Intelligence: {new string('\u2022', 2)}, Cost: {new string('\u2022', 1)}",
         _ => throw new ArgumentOutOfRangeException(nameof(model))
     };
+    
+    public static void UpdateSelectedOption<T>(this string[] selections, string value) where T : struct, Enum
+    {
+        if (Enum.TryParse(value, out T enumValue))
+        {
+            var configuredOptionIdx = Convert.ToInt32(enumValue);
+            selections[configuredOptionIdx] = $"[X] {selections[configuredOptionIdx]}";
+        }
+    }
+
+    public static string ParseApiName(this string configuredLlm) =>
+        Enum.TryParse<LlmModel>(configuredLlm, out var model) ? 
+            model.ToApiName() :
+            Enum.GetValues<LlmModel>()[0].ToApiName();
 }

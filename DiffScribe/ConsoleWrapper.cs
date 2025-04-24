@@ -1,5 +1,3 @@
-using System.Collections.Immutable;
-
 namespace DiffScribe;
 
 public static class ConsoleWrapper
@@ -33,7 +31,7 @@ public static class ConsoleWrapper
         Console.WriteLine(line);
     }
 
-    public static int ShowSelectionList(ImmutableArray<string> options, string title)
+    public static int ShowSelectionList(string[] options, string title)
     {
         ConsoleKeyInfo keyInfo;
         var selectionIdx = 0;

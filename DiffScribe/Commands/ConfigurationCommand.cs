@@ -1,4 +1,3 @@
-using System.Collections.Immutable;
 using DiffScribe.AI;
 using DiffScribe.Commands.Models;
 using DiffScribe.Configuration;
@@ -30,14 +29,14 @@ public class ConfigurationCommand(IServiceProvider provider) : ICommand
     private readonly ConfigHandler _configHandler = provider.GetRequiredService<ConfigHandler>();
     private readonly OpenAiClient _openAiClient = provider.GetRequiredService<OpenAiClient>();
     
-    private readonly ImmutableArray<string> _commitStyleSelections =
+    private readonly string[] _commitStyleSelections =
     [
         $"{CommitStyle.Minimal} (Short, one-line commit title.)",
         $"{CommitStyle.Standard} (Clear commit title with brief context.)",
         $"{CommitStyle.Detailed} (Descriptive title followed by an in-depth explanation.)"
     ];
     
-    private readonly ImmutableArray<string> _llmSelections =
+    private readonly string[] _llmSelections =
     [
         $"{LlmModel.Gpt4o.ToDisplayName()} ({LlmModel.Gpt4o.GetStats()})",
         $"{LlmModel.Gpt4oMini.ToDisplayName()} ({LlmModel.Gpt4oMini.GetStats()})",
@@ -85,6 +84,8 @@ public class ConfigurationCommand(IServiceProvider provider) : ICommand
 
     private void MakeCommitStyleSelection(ref ToolConfiguration toolConfig)
     {
+        _commitStyleSelections.UpdateSelectedOption<CommitStyle>(toolConfig.CommitStyle);
+
         var selectedIdx = ConsoleWrapper.ShowSelectionList(
             _commitStyleSelections,
             title: "Select a commit style that fits your needs:");
@@ -110,13 +111,15 @@ public class ConfigurationCommand(IServiceProvider provider) : ICommand
 
     private void MakeModelSelection(ref ToolConfiguration toolConfig)
     {
+        _llmSelections.UpdateSelectedOption<LlmModel>(toolConfig.Llm);
+
         var selectedIdx = ConsoleWrapper.ShowSelectionList(
             _llmSelections,
             title: "Select a model for commit title generation:");
 
         if (selectedIdx != -1)
         {
-            toolConfig.Llm = ((LlmModel)selectedIdx).ToApiName();
+            toolConfig.Llm = ((LlmModel)selectedIdx).ToString();
         }
     }
 }
