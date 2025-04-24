@@ -1,4 +1,3 @@
-using System.Collections.Immutable;
 using DiffScribe.Configuration.Enums;
 
 namespace DiffScribe.Extensions;
@@ -7,14 +6,22 @@ public static class EnumExtensions
 {
     public static string ToApiName(this LlmModel model) => model switch
     {
-        LlmModel.Gpt3_5 => "gpt-3.5-turbo",
         LlmModel.Gpt4o => "gpt-4o",
         LlmModel.Gpt4oMini => "gpt-4o-mini",
+        LlmModel.Gpt4_1 => "gpt-4.1",
+        LlmModel.Gpt4_1Mini => "gpt-4.1-mini",
+        LlmModel.Gpt4_1Nano => "gpt-4.1-nano",
         _ => throw new ArgumentOutOfRangeException(nameof(model))
     };
 
-    public static ImmutableArray<string> CreateSelectionList<T>() where T : struct, Enum
+    public static string ToDisplayName(this LlmModel model) => model switch
     {
-        return [..Enum.GetValues<T>().Select(v => v.ToString())];
-    }
+        LlmModel.Gpt4o => "GPT-4o",
+        LlmModel.Gpt4oMini => "GPT-4o mini",
+        LlmModel.Gpt4_1 => "GPT-4.1",
+        LlmModel.Gpt4_1Mini => "GPT-4.1 mini",
+        LlmModel.Gpt4_1Nano => "GPT-4.1 nano",
+        _ => throw new ArgumentOutOfRangeException(nameof(model))
+    };
+
 }
