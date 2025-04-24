@@ -11,6 +11,8 @@ class Program
 {
     public static void Main(string[] args)
     {
+        SetConsoleSettings();
+        
         var serviceCollection = RegisterServices();
         var serviceProvider = serviceCollection.BuildServiceProvider();
 
@@ -19,6 +21,11 @@ class Program
 
         var commandDispatcher = serviceProvider.GetRequiredService<CommandDispatcher>();
         commandDispatcher.Dispatch(commandInfo);
+    }
+
+    private static void SetConsoleSettings()
+    {
+        Console.OutputEncoding = System.Text.Encoding.UTF8;
     }
 
     private static ServiceCollection RegisterServices()
