@@ -22,4 +22,14 @@
         </None>
     </ItemGroup>
 
+    <Target Name="CopyScriptFiles" AfterTargets="Build;Publish">
+        <ItemGroup>
+            <ScriptFiles Include="Scripts/*.ps1" 
+                         Condition="'$(RuntimeIdentifier)' == 'win-x64'" />
+            <ScriptFiles Include="Scripts/*.sh" 
+                         Condition="'$(RuntimeIdentifier)' == 'linux-x64' Or '$(RuntimeIdentifier)' == 'osx-x64'" />
+        </ItemGroup>
+        <Copy SourceFiles="@(ScriptFiles)" DestinationFolder="$(OutputPath)/Installation" SkipUnchangedFiles="true" />
+    </Target>
+
 </Project>
