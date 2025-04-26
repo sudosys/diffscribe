@@ -41,8 +41,7 @@ class Program
             .AddSingleton<GitRunner>()
             .AddScoped<OpenAiClient>()
             .AddSingleton<CommitGenerator>()
-            .AddSingleton<EncryptionService>()
-            .AddSingleton<AppConfiguration>();
+            .AddSingleton<EncryptionService>();
         
         return serviceCollection;
     }
