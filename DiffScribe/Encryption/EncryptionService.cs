@@ -92,6 +92,8 @@ public class EncryptionService
         }
         
         File.WriteAllText(_secretKeyFilePath, key);
+        
+        SetFileAttributes();
     }
     
     private void CreateRestrictedFileWindows()
@@ -130,4 +132,7 @@ public class EncryptionService
         File.Create(_secretKeyFilePath).Close();
         File.SetUnixFileMode(_secretKeyFilePath, UnixFileMode.UserRead | UnixFileMode.UserWrite);
     }
+
+    private void SetFileAttributes() => 
+        File.SetAttributes(_secretKeyFilePath, FileAttributes.ReadOnly | FileAttributes.Hidden);
 }
