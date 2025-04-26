@@ -1,9 +1,20 @@
+using System.Reflection;
 using System.Security.Cryptography;
+using System.Security.AccessControl;
+using System.Security.Principal;
 
 namespace DiffScribe.Encryption;
 
-public class EncryptionService(AppConfiguration appConfig)
+#pragma warning disable CA1416
+
+public class EncryptionService
 {
+    private const string SecretFileName = ".secret";
+    
+    private readonly string _secretKeyFilePath = Path.Combine(
+        Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
+        SecretFileName);
+    
     public string EncryptText(string plainText)
     {
         using var aes = Aes.Create();
@@ -48,9 +59,75 @@ public class EncryptionService(AppConfiguration appConfig)
         return reader.ReadToEnd();
     }
     
-    private string GetSecretKey()
+    private string GetSecretKey() => 
+        File.Exists(_secretKeyFilePath) ? File.ReadAllText(_secretKeyFilePath) : UpdateSecretKey();
+
+    public string UpdateSecretKey()
     {
-        return appConfig.Configuration["Encryption:AES:SecretKey"] 
-               ?? throw new InvalidOperationException("No secret key configured.");
+        var key = CreateSecretKey();
+        WriteSecretKey(key);
+        return key;
+    }
+
+    private string CreateSecretKey()
+    {
+        var key = new byte[32];
+        using var rng = RandomNumberGenerator.Create();
+        rng.GetBytes(key);
+        return Convert.ToBase64String(key);
+    }
+
+    private void WriteSecretKey(string key)
+    {
+        if (!File.Exists(_secretKeyFilePath))
+        {
+            if (OperatingSystem.IsWindows())
+            {
+                CreateRestrictedFileWindows();
+            }
+            else
+            {
+                CreateRestrictedFileUnix();
+            }
+        }
+        
+        File.WriteAllText(_secretKeyFilePath, key);
+    }
+    
+    private void CreateRestrictedFileWindows()
+    {
+        var fileInfo = new FileInfo(_secretKeyFilePath);
+        
+        fileInfo.Create().Close();
+        fileInfo.SetAccessControl(SetFileAccessRules());
+    }
+
+    private FileSecurity SetFileAccessRules()
+    {
+        var fileSecurity = new FileSecurity();
+        fileSecurity.SetAccessRuleProtection(true, false);
+        
+        var everyone = new SecurityIdentifier(WellKnownSidType.WorldSid, null);
+        fileSecurity.AddAccessRule(new FileSystemAccessRule(
+            everyone,
+            FileSystemRights.FullControl,
+            AccessControlType.Deny));
+        
+        var currentUser = WindowsIdentity.GetCurrent().User;
+        if (currentUser != null)
+        {
+            fileSecurity.AddAccessRule(new FileSystemAccessRule(
+                currentUser,
+                FileSystemRights.Read | FileSystemRights.Write,
+                AccessControlType.Allow));
+        }
+
+        return fileSecurity;
+    }
+    
+    private void CreateRestrictedFileUnix()
+    {
+        File.Create(_secretKeyFilePath).Close();
+        File.SetUnixFileMode(_secretKeyFilePath, UnixFileMode.UserRead | UnixFileMode.UserWrite);
     }
 }

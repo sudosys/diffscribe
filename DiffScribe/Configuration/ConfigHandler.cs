@@ -143,6 +143,8 @@ public class ConfigHandler
     #region API Key
     public void UpdateApiKey(string apiKey)
     {
+        _encryptionService.UpdateSecretKey();
+        
         var encrypted = _encryptionService.EncryptText(apiKey);
         
         Configuration.ApiKey = encrypted;
