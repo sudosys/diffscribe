@@ -1,6 +1,14 @@
 #!/bin/sh
 
-SRC="$(pwd)"
+if [ -f "$(pwd)/dsc" ]; then
+    SRC="$(pwd)"
+elif [ -f "$(dirname "$(pwd)")/dsc" ]; then
+    SRC="$(dirname "$(pwd)")"
+else
+    echo "Error: dsc not found in the current or parent directory."
+    exit 1
+fi
+
 DEST="/usr/local/DiffScribe"
 
 sudo mkdir -p "$DEST"

@@ -1,4 +1,15 @@
-$source = (Get-Location).Path
+$scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+$parentDir = Split-Path -Parent $scriptDir
+
+if (Test-Path (Join-Path $scriptDir "dsc.exe")) {
+    $source = $scriptDir
+} elseif (Test-Path (Join-Path $parentDir "dsc.exe")) {
+    $source = $parentDir
+} else {
+    Write-Error "Could not find dsc.exe in the current or parent directory."
+    exit 1
+}
+
 $dest = "$env:ProgramFiles\DiffScribe"
 
 Copy-Item -Recurse -Force $source $dest
