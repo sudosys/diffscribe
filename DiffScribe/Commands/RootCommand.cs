@@ -17,7 +17,7 @@ public class RootCommand(CommandMatcher commandMatcher) : ICommand
     }
 
     private void PrintToolHeader() =>
-        Console.WriteLine("""
+        Console.WriteLine($"""
                           >>========================================================================================<<
                           || ██████████    ███    ██████ ██████ █████████                      ████████             ||
                           ||░░███░░░░███  ░░░    ███░░█████░░█████░░░░░███                    ░░░░░███              ||
@@ -28,6 +28,7 @@ public class RootCommand(CommandMatcher commandMatcher) : ICommand
                           || ██████████   █████ █████  █████  ░░█████████ ░░██████  █████     ████████████ ░░██████ ||
                           ||░░░░░░░░░░   ░░░░░ ░░░░░  ░░░░░    ░░░░░░░░░   ░░░░░░  ░░░░░     ░░░░░░░░░░░░   ░░░░░░  ||
                           >>========================================================================================<<
+                          Version: {AppInfo.Version} {Environment.NewLine}
                           """);
 
     private void RunHelpCommand()
