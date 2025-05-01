@@ -12,7 +12,7 @@ public class GenerateCommand(IServiceProvider provider) : ICommand
 {
     public string Name => "generate";
 
-    public string Description => "Generate a commit title based on the staged changes and desired commit structure.";
+    public string Description => "Generate a commit message based on the staged changes and desired commit structure.";
 
     private const string AutoCommitArg = "--auto-commit";
     

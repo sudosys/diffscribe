@@ -31,9 +31,9 @@ public class ConfigurationCommand(IServiceProvider provider) : ICommand
     
     private readonly string[] _commitStyleSelections =
     [
-        $"{CommitStyle.Minimal} (Short, one-line commit title.)",
-        $"{CommitStyle.Standard} (Clear commit title with brief context.)",
-        $"{CommitStyle.Detailed} (Descriptive title followed by an in-depth explanation.)"
+        $"{CommitStyle.Minimal} (Short, one-line commit message.)",
+        $"{CommitStyle.Standard} (Clear commit message with brief context.)",
+        $"{CommitStyle.Detailed} (Descriptive commit message followed by an in-depth explanation.)"
     ];
     
     private readonly string[] _llmSelections =
@@ -120,7 +120,7 @@ public class ConfigurationCommand(IServiceProvider provider) : ICommand
 
         var selectedIdx = ConsoleWrapper.ShowSelectionList(
             _llmSelections,
-            title: "Select a model for commit title generation:");
+            title: "Select a model for commit message generation:");
 
         if (selectedIdx == -1)
         {
