@@ -1,20 +1,19 @@
 #!/bin/sh
 
-if [ -f "$(pwd)/dsc" ]; then
-    SRC="$(pwd)"
-elif [ -f "$(dirname "$(pwd)")/dsc" ]; then
-    SRC="$(dirname "$(pwd)")"
-else
-    echo "Error: dsc not found in the current or parent directory."
-    exit 1
-fi
-
+SRC="$(pwd)"
 DEST="/usr/local/DiffScribe"
 
 sudo mkdir -p "$DEST"
 sudo cp -r "$SRC"/* "$DEST/"
 
-PROFILE="$HOME/.profile" # update the profile file name depending on your shell
+case "$SHELL" in
+    */zsh)   PROFILE="$HOME/.zprofile"      ;; # zsh
+    */bash)  PROFILE="$HOME/.bash_profile"  ;; # bash
+    */ksh)   PROFILE="$HOME/.profile"       ;; # ksh / sh
+    */fish)  PROFILE="$HOME/.config/fish/config.fish" ;; # fish shell
+    *)       PROFILE="$HOME/.profile"       ;; # fallback
+esac
+
 if ! grep -qs "$DEST" "$PROFILE"; then
     printf "\nexport PATH=\"\$PATH:$DEST\"" >> "$PROFILE"
     echo "Added $DEST to PATH. Restart your session."
