@@ -90,10 +90,15 @@ public class ConfigurationCommand(IServiceProvider provider) : ICommand
             _commitStyleSelections,
             title: "Select a commit style that fits your needs:");
 
-        if (selectedIdx != -1)
+        if (selectedIdx == -1)
         {
-            toolConfig.CommitStyle = ((CommitStyle)selectedIdx).ToString();
+            return;
         }
+
+        var updatedStyle = ((CommitStyle)selectedIdx).ToString();
+        toolConfig.CommitStyle = updatedStyle;
+        
+        ConsoleWrapper.Info($"Commit style has been updated to \"{updatedStyle}\".");
     }
 
     private void UpdateApiKey(string apiKey)
@@ -117,9 +122,14 @@ public class ConfigurationCommand(IServiceProvider provider) : ICommand
             _llmSelections,
             title: "Select a model for commit title generation:");
 
-        if (selectedIdx != -1)
+        if (selectedIdx == -1)
         {
-            toolConfig.Llm = ((LlmModel)selectedIdx).ToString();
+            return;
         }
+
+        var updatedModel = (LlmModel)selectedIdx;
+        toolConfig.Llm = updatedModel.ToString();
+        
+        ConsoleWrapper.Info($"Model has been updated to \"{updatedModel.ToDisplayName()}\".");
     }
 }
