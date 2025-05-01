@@ -1,3 +1,4 @@
+using ConsoleTables;
 using DiffScribe.AI;
 using DiffScribe.Commands.Models;
 using DiffScribe.Configuration;
@@ -89,8 +90,10 @@ public class GenerateCommand(IServiceProvider provider) : ICommand
 
     private void PrintPostGeneration(string commitMessage)
     {
-        Console.WriteLine();
-        ConsoleWrapper.Success($"Generated commit message: \n---\n{commitMessage}\n---\n");
+        Console.WriteLine('\n');
+        new ConsoleTable("Generated commit message")
+            .AddRow(commitMessage)
+            .Write(Format.MarkDown);
     }
 
     private void CopyToClipboard(string commitMessage)
