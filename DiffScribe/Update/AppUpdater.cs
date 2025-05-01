@@ -35,6 +35,8 @@ public class AppUpdater
         await StartInstallation(shFile);
         
         ConsoleWrapper.Success("New version has been installed successfully.");
+        
+        DoFileCleanup(zipPath, tempPath);
     }
 
     private string CreateTempDirectory()
@@ -63,6 +65,14 @@ public class AppUpdater
         ConsoleWrapper.Error(error);
         
         await process.WaitForExitAsync();
+    }
+
+    private void DoFileCleanup(params string[] paths)
+    {
+        foreach (var path in paths)
+        {
+            Directory.Delete(path, true);
+        }
     }
     #endregion
 
