@@ -23,7 +23,7 @@
             <ScriptFiles Include="Scripts/*.sh" 
                          Condition="'$(RuntimeIdentifier)' == 'linux-x64' Or '$(RuntimeIdentifier)' == 'osx-x64'" />
         </ItemGroup>
-        <Copy SourceFiles="@(ScriptFiles)" DestinationFolder="$(OutputPath)/Installation" SkipUnchangedFiles="true" />
+        <Copy SourceFiles="@(ScriptFiles)" DestinationFolder="$(OutputPath)" SkipUnchangedFiles="true" />
     </Target>
 
 </Project>
