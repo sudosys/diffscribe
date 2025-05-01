@@ -20,7 +20,9 @@ public class CommitGenerator(OpenAiClient client, ConfigHandler configHandler)
     {
         var diffMessage = new UserChatMessage(diffs);
         ChatMessage[] messages = [_commitGenInstruction, CreateCommitStyleInstruction(), diffMessage];
-        return client.SendMessage(messages);
+        
+        var commitMsg = client.SendMessage(messages);
+        return commitMsg.Trim();
     }
 
     private SystemChatMessage CreateCommitStyleInstruction()
