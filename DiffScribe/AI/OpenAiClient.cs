@@ -19,10 +19,14 @@ public class OpenAiClient(ConfigHandler configHandler)
 
         return true;
     }
+    
+    private ChatClient GetClient(string? apiKey = null) => 
+        new(model: configHandler.Configuration.Llm.ParseApiName(),
+            apiKey: apiKey ?? configHandler.ReadApiKey());
 
     public string SendMessage(params ChatMessage[] message)
     {
-        var client = GetClient(apiKey: null);
+        var client = GetClient();
         return SendMessage(client, message);
     }
     
@@ -32,8 +36,4 @@ public class OpenAiClient(ConfigHandler configHandler)
 
         return completion.Value.Content[0].Text;
     }
-
-    private ChatClient GetClient(string? apiKey = null) => 
-        new(model: configHandler.Configuration.Llm.ParseApiName(),
-            apiKey: apiKey ?? configHandler.ReadApiKey());
 }
