@@ -62,7 +62,10 @@ public class AppUpdater
             });
         
         var error = await process!.StandardError.ReadToEndAsync();
-        ConsoleWrapper.Error(error);
+        if (!string.IsNullOrEmpty(error))
+        {
+            ConsoleWrapper.Error(error);
+        }
         
         await process.WaitForExitAsync();
     }
@@ -71,7 +74,14 @@ public class AppUpdater
     {
         foreach (var path in paths)
         {
-            Directory.Delete(path, true);
+            try
+            {
+                Directory.Delete(Path.GetFullPath(path), true);
+            }
+            catch (Exception)
+            {
+                // ignored
+            }
         }
     }
     #endregion
