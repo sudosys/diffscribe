@@ -19,6 +19,8 @@ public class CommandMatcher
             { "help", new Lazy<ICommand>(() => new HelpCommand(this)) },
             { "version", new Lazy<ICommand>(() => new VersionCommand()) },
             { "v", new Lazy<ICommand>(() => new VersionCommand()) },
+            { "update", new Lazy<ICommand>(() => new UpdateCommand(provider)) },
+            { "u", new Lazy<ICommand>(() => new UpdateCommand(provider)) },
         };
     }
 
