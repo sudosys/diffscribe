@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.IO.Compression;
 using System.Net;
+using System.Runtime.InteropServices;
 using System.Text.Json;
 using DiffScribe.Update.Models;
 
@@ -93,7 +94,7 @@ public class AppUpdater
         if (latestRelease != null && CompareLatestWithCurrentVersion(latestRelease.TagName))
         {
             ConsoleWrapper.Info("New version of DiffScribe available!");
-            return latestRelease.Assets[0].DownloadUrl;
+            return ResolveAssetDownloadUrl(latestRelease);
         }
 
         return null;
@@ -144,4 +145,9 @@ public class AppUpdater
         var concatVersion = string.Join("", version.Trim(VersionPrefix).Split('.'));
         return int.TryParse(concatVersion, out var versionNumber) ? versionNumber : 0;
     }
+
+    private string? ResolveAssetDownloadUrl(AppRelease release) =>
+        release.Assets
+            .SingleOrDefault(a => a.Name[..a.Name.LastIndexOf('.')].EndsWith(RuntimeInformation.RuntimeIdentifier))
+            ?.DownloadUrl;
 }
