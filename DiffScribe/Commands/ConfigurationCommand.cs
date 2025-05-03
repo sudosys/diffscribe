@@ -53,6 +53,8 @@ public class ConfigurationCommand(IServiceProvider provider) : ICommand
             return;
         }
         
+        ValidateArgumentCombination(args);
+        
         var toolConfig = _configHandler.Configuration;
         foreach (var (arg, value) in args)
         {
@@ -80,6 +82,22 @@ public class ConfigurationCommand(IServiceProvider provider) : ICommand
     {
         _configHandler.TryCreateConfigFile();
         _configHandler.PrintCurrentConfigAsTable();
+    }
+
+    private void ValidateArgumentCombination(Dictionary<string, object?> args)
+    {
+        var interactiveArgs = DefinedArguments
+            .Where(a => a.Type == typeof(void));
+
+        var anyInteractiveArgGiven = interactiveArgs
+            .Any(a => args.ContainsKey(a.Name));
+        
+        var interactiveArgCombined = anyInteractiveArgGiven && args.Count > 1;
+
+        if (interactiveArgCombined)
+        {
+            throw new InvalidOperationException("Interactive arguments cannot be combined with other arguments. Execute them separately.");
+        }
     }
 
     private void MakeCommitStyleSelection(ref ToolConfiguration toolConfig)
