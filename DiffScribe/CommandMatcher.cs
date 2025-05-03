@@ -10,39 +10,57 @@ public class CommandMatcher
     {
         _commandMappings = new Dictionary<string, Lazy<ICommand>>
         {
-            { "root", new Lazy<ICommand>(() => new RootCommand(this)) },
+            { string.Empty, new Lazy<ICommand>(() => new RootCommand(this)) },
             { "generate", new Lazy<ICommand>(() => new GenerateCommand(provider)) },
-            { "g", new Lazy<ICommand>(() => new GenerateCommand(provider)) },
             { "config", new Lazy<ICommand>(() => new ConfigurationCommand(provider)) },
-            { "c", new Lazy<ICommand>(() => new ConfigurationCommand(provider)) },
             { "reset", new Lazy<ICommand>(() => new ResetCommand(provider)) },
             { "help", new Lazy<ICommand>(() => new HelpCommand(this)) },
             { "version", new Lazy<ICommand>(() => new VersionCommand()) },
-            { "v", new Lazy<ICommand>(() => new VersionCommand()) },
             { "update", new Lazy<ICommand>(() => new UpdateCommand(provider)) },
-            { "u", new Lazy<ICommand>(() => new UpdateCommand(provider)) },
         };
     }
 
     public bool TryMatch(string commandName, out ICommand? command)
     {
-        if (_commandMappings.TryGetValue(commandName, out var cmd) 
-            && DoesNameMatch(commandName, cmd.Value.Name))
+        if (GetMappedCommand(commandName, out var cmd))
         {
-            command = cmd.Value;
+            command = cmd;
             return true;
         }
         
         command = null;
         return false;
     }
-    
-    private static bool DoesNameMatch(string input, string commandName) 
-        => string.Equals(input, commandName) || commandName.StartsWith(input);
+
+    private bool GetMappedCommand(string commandName, out ICommand? command)
+    {
+        switch (commandName.Length)
+        {
+            case 1:
+            {
+                var possibleKeys = _commandMappings.Keys
+                    .Where(k => k.StartsWith(commandName))
+                    .ToList();
+
+                if (possibleKeys.Count > 1)
+                {
+                    ConsoleWrapper
+                        .Error($"Ambiguous command: {commandName}. Possible matches are: {string.Join(", ", possibleKeys)}");
+                    command = null;
+                    return false;
+                }
+            
+                return GetMappedCommand(possibleKeys.Single(), out command);
+            }
+            default:
+                _commandMappings.TryGetValue(commandName, out var cmd);
+                command = cmd?.Value;
+                return command is not null;
+        }
+    }
     
     public string[] GetDefinedCommandNames() 
         => _commandMappings.Keys
-            .Skip(1)
-            .Where(key => key.Length > 1)
+            .Where(k => k != string.Empty)
             .ToArray();
 }

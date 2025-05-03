@@ -2,7 +2,7 @@ namespace DiffScribe.Parser;
 
 public class CommandParser
 {
-    private readonly CommandInfo _rootCommandInfo = new("root", []);
+    private readonly CommandInfo _rootCommandInfo = new(string.Empty, []);
    
     public CommandInfo Parse(string[] args)
     {
