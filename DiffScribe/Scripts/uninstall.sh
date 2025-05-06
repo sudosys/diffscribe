@@ -1,11 +1,18 @@
 #!/bin/sh
 
 DEST="/usr/local/DiffScribe"
-PROFILE="$HOME/.profile" # update the profile file name depending on your shell
+
+case "$SHELL" in
+    */zsh)   PROFILE="$HOME/.zprofile"      ;; # zsh
+    */bash)  PROFILE="$HOME/.bash_profile"  ;; # bash
+    */ksh)   PROFILE="$HOME/.profile"       ;; # ksh / sh
+    */fish)  PROFILE="$HOME/.config/fish/config.fish" ;; # fish shell
+    *)       PROFILE="$HOME/.profile"       ;; # fallback
+esac
 
 sudo rm -rf "$DEST"
 
 if grep -qs "$DEST" "$PROFILE"; then
-    sed -i.bak "/$DEST/d" "$PROFILE"
+    sed -i.bak '/DiffScribe/d' "$PROFILE"
     echo "$DEST removed from PATH. Restart your shell session."
 fi
