@@ -11,6 +11,7 @@ case "$SHELL" in
 esac
 
 sudo rm -rf "$DEST"
+echo "Removed $DEST and its contents."
 
 if grep -qs "$DEST" "$PROFILE"; then
     sed -i.bak '/DiffScribe/d' "$PROFILE"
