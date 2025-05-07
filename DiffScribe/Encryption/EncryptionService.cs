@@ -134,5 +134,5 @@ public class EncryptionService
     }
 
     private void SetFileAttributes() => 
-        File.SetAttributes(_secretKeyFilePath, FileAttributes.ReadOnly | FileAttributes.Hidden);
+        File.SetAttributes(_secretKeyFilePath, FileAttributes.Hidden);
 }
