@@ -4,16 +4,6 @@ namespace DiffScribe.Extensions;
 
 public static class EnumExtensions
 {
-    public static string ToApiName(this LlmModel model) => model switch
-    {
-        LlmModel.Gpt4o => "gpt-4o",
-        LlmModel.Gpt4oMini => "gpt-4o-mini",
-        LlmModel.Gpt4_1 => "gpt-4.1",
-        LlmModel.Gpt4_1Mini => "gpt-4.1-mini",
-        LlmModel.Gpt4_1Nano => "gpt-4.1-nano",
-        _ => throw new ArgumentOutOfRangeException(nameof(model))
-    };
-
     public static string ToDisplayName(this LlmModel model) => model switch
     {
         LlmModel.Gpt4o => "GPT-4o",
@@ -47,4 +37,14 @@ public static class EnumExtensions
         Enum.TryParse<LlmModel>(configuredLlm, out var model) ? 
             model.ToApiName() :
             Enum.GetValues<LlmModel>()[0].ToApiName();
+
+    private static string ToApiName(this LlmModel model) => model switch
+    {
+        LlmModel.Gpt4o => "gpt-4o",
+        LlmModel.Gpt4oMini => "gpt-4o-mini",
+        LlmModel.Gpt4_1 => "gpt-4.1",
+        LlmModel.Gpt4_1Mini => "gpt-4.1-mini",
+        LlmModel.Gpt4_1Nano => "gpt-4.1-nano",
+        _ => throw new ArgumentOutOfRangeException(nameof(model))
+    };
 }
