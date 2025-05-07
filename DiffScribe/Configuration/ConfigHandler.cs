@@ -137,7 +137,7 @@ public class ConfigHandler
             commitStyle: nameof(CommitStyle.Standard),
             autoCommit: false,
             apiKey: string.Empty,
-            llm: LlmModel.Gpt4oMini.ToApiName());
+            llm: nameof(LlmModel.Gpt4oMini));
     }
 
     #region API Key
