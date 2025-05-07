@@ -150,6 +150,43 @@ dsc help --generate
 
 ---
 
+### 4.5 `update`
+
+Checks for available updates and downloads the latest version if one is found.
+
+| Syntax         | Description                                        |
+|----------------|----------------------------------------------------|
+| `dsc update`   | Checks if an update is available and downloads it. |
+
+When run, this command will check for a newer version of DiffScribe.
+If an update is detected, the required files will be downloaded and the user informed.
+If the tool is already up to date, it will notify you accordingly.
+
+---
+
+### 4.6 `version`
+
+Displays the current version of the CLI tool.
+
+| Syntax         | Description                                   |
+|----------------|-----------------------------------------------|
+| `dsc version`  | Prints the current version to the console.    |
+
+---
+
+### 4.7 `uninstall`
+
+Uninstalls DiffScribe from your system.
+
+| Syntax           | Description                                      |
+|------------------|--------------------------------------------------|
+| `dsc uninstall`  | Prompts for confirmation and removes DiffScribe. |
+
+Running this command will prompt you to confirm whether you wish to uninstall DiffScribe.
+<br/>Upon confirmation, the tool will run the appropriate uninstallation script for your operating system, remove the application files, and provide feedback on the process.
+
+---
+
 ## 5. First-time Quick-start
 
 1. `dsc config --api-key <OPENAI_API_KEY>`
