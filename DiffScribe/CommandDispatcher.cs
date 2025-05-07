@@ -1,16 +1,19 @@
 using DiffScribe.Parser;
+using DiffScribe.Update;
 
 namespace DiffScribe;
 
-public class CommandDispatcher(ArgumentValidator argumentValidator, CommandMatcher commandMatcher)
+public class CommandDispatcher(ArgumentValidator argumentValidator, CommandMatcher commandMatcher, AppUpdater appUpdater)
 {
-    public void Dispatch(CommandInfo commandInfo)
+    public async Task Dispatch(CommandInfo commandInfo)
     {
         if (!commandMatcher.TryMatch(commandInfo.Name, out var command) || command == null)
         {
             ConsoleWrapper.Error($"Unknown command: {commandInfo.Name}");
             return;
         }
+        
+        await appUpdater.CheckForUpdates(command.Name);
 
         if (!argumentValidator.Validate(command.DefinedArguments, commandInfo.Arguments))
         {

@@ -10,6 +10,28 @@ namespace DiffScribe.Update;
 public class AppUpdater
 {
     private const char VersionPrefix = 'v';
+    
+    private readonly string[] _updateIgnoredCommands =
+    [
+        "update",
+        "uninstall",
+        "version"
+    ];
+
+    public async Task CheckForUpdates(string commandToBeExecuted)
+    {
+        if (_updateIgnoredCommands.Contains(commandToBeExecuted))
+        {
+            return;
+        }
+        
+        var url = await TryGetNewVersionUrl();
+
+        if (url != null)
+        {
+            await DownloadInstallUpdate(url);
+        }
+    }
 
     #region Update Downloading
     public async Task DownloadInstallUpdate(string downloadUrl)
@@ -87,11 +109,12 @@ public class AppUpdater
     }
     #endregion
 
+    #region Get Latest Version
     public async Task<string?> TryGetNewVersionUrl()
     {
         var latestRelease = await GetLatestRelease();
 
-        if (latestRelease != null && CompareLatestWithCurrentVersion(latestRelease.TagName))
+        if (latestRelease != null && IsLatestVersionNewerThanCurrent(latestRelease.TagName))
         {
             ConsoleWrapper.Info("New version of DiffScribe available!");
             return ResolveAssetDownloadUrl(latestRelease);
@@ -132,7 +155,7 @@ public class AppUpdater
     private static string GetLatestReleaseEndpointUrl() 
         => $"https://api.github.com/repos/{AppInfo.OwnerUsername}/{AppInfo.Name.ToLower()}/releases/latest";
     
-    private bool CompareLatestWithCurrentVersion(string latestVersionTag)
+    private bool IsLatestVersionNewerThanCurrent(string latestVersionTag)
     {
         var parsedLatestVersion = ParseVersion(latestVersionTag);
         var parsedCurrentVersion = ParseVersion(AppInfo.Version);
@@ -150,4 +173,5 @@ public class AppUpdater
         release.Assets
             .SingleOrDefault(a => a.Name[..a.Name.LastIndexOf('.')].EndsWith(RuntimeInformation.RuntimeIdentifier))
             ?.DownloadUrl;
+    #endregion
 }

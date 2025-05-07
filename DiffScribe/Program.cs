@@ -17,13 +17,11 @@ class Program
         var serviceCollection = RegisterServices();
         var serviceProvider = serviceCollection.BuildServiceProvider();
 
-        await TryInstallUpdate(serviceProvider);
-
         var commandParser = serviceProvider.GetRequiredService<CommandParser>();
         var commandInfo = commandParser.Parse(args);
         
         var commandDispatcher = serviceProvider.GetRequiredService<CommandDispatcher>();
-        commandDispatcher.Dispatch(commandInfo);
+        await commandDispatcher.Dispatch(commandInfo);
     }
 
     private static void SetConsoleSettings()
@@ -52,13 +50,7 @@ class Program
     
     private static async Task TryInstallUpdate(IServiceProvider provider)
     {
-        var appUpdater = provider.GetRequiredService<AppUpdater>();
 
-        var url = await appUpdater.TryGetNewVersionUrl();
 
-        if (url != null)
-        {
-            await appUpdater.DownloadInstallUpdate(url);
-        }
     }
 }
