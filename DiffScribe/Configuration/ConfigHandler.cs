@@ -39,25 +39,27 @@ public class ConfigHandler
     
     private ToolConfiguration ReadConfiguration()
     {
-        var serialized = string.Empty;
+        string serialized;
         try
         {
             serialized = File.ReadAllText(ConfigFilePath);
         }
         catch (FileNotFoundException)
         {
-            HandleNonExistence();
+            return TryCreateAndReadConfig();
         }
         catch (DirectoryNotFoundException)
         {
-            HandleNonExistence();
+            return TryCreateAndReadConfig();
         }
         
         return Deserialize(serialized);
-        void HandleNonExistence()
+        ToolConfiguration TryCreateAndReadConfig()
         {
             ConsoleWrapper.Warning("Configuration not found. Creating default configuration file.");
             TryCreateConfigFile();
+            
+            return ReadConfiguration();
         }
     }
 
