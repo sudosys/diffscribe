@@ -9,7 +9,6 @@ public class CommandDispatcher(ArgumentValidator argumentValidator, CommandMatch
     {
         if (!commandMatcher.TryMatch(commandInfo.Name, out var command) || command == null)
         {
-            ConsoleWrapper.Error($"Unknown command: {commandInfo.Name}");
             return;
         }
         

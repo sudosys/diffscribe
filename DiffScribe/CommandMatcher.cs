@@ -56,7 +56,13 @@ public class CommandMatcher
             default:
                 _commandMappings.TryGetValue(commandName, out var cmd);
                 command = cmd?.Value;
-                return command is not null;
+                
+                if (command is null)
+                {
+                    ConsoleWrapper.Error($"Unknown command: {commandName}");
+                    return false;   
+                }
+                return true;
         }
     }
     
