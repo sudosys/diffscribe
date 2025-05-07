@@ -20,8 +20,18 @@ class Program
         var commandParser = serviceProvider.GetRequiredService<CommandParser>();
         var commandInfo = commandParser.Parse(args);
         
+        var commandMatcher = serviceProvider.GetRequiredService<CommandMatcher>();
+
+        if (!commandMatcher.TryMatch(commandInfo.Name, out var command) || command == null)
+        {
+            return;
+        }
+        
+        var appUpdater = serviceProvider.GetRequiredService<AppUpdater>();
+        await appUpdater.CheckForUpdates(command.Name);
+
         var commandDispatcher = serviceProvider.GetRequiredService<CommandDispatcher>();
-        await commandDispatcher.Dispatch(commandInfo);
+        commandDispatcher.Dispatch(commandInfo, command);
     }
 
     private static void SetConsoleSettings()
@@ -46,11 +56,5 @@ class Program
             .AddSingleton<AppUpdater>();
         
         return serviceCollection;
-    }
-    
-    private static async Task TryInstallUpdate(IServiceProvider provider)
-    {
-
-
     }
 }
