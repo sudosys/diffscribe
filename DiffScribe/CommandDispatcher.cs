@@ -23,7 +23,6 @@ public class CommandDispatcher(ArgumentValidator argumentValidator, CommandMatch
         }
         catch (Exception e)
         {
-            Console.WriteLine();
             ConsoleWrapper.Error($"{e.GetType()}: {e.Message}");
         }
     }
