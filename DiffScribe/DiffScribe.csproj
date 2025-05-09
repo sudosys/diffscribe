@@ -17,7 +17,7 @@
       <PackageReference Include="TextCopy" Version="6.2.1" />
     </ItemGroup>
 
-    <Target Name="CopyScriptFiles" AfterTargets="Build;Publish">
+    <Target Name="CopyScriptFiles" AfterTargets="Publish">
         <ItemGroup>
             <ScriptFiles Include="Scripts/*.ps1" 
                          Condition="'$(RuntimeIdentifier)' == 'win-x64'" />
@@ -26,7 +26,7 @@
                                      Or '$(RuntimeIdentifier)' == 'osx-x64' 
                                      Or '$(RuntimeIdentifier)' == 'osx-arm64'" />
         </ItemGroup>
-        <Copy SourceFiles="@(ScriptFiles)" DestinationFolder="$(OutputPath)" SkipUnchangedFiles="true" />
+        <Copy SourceFiles="@(ScriptFiles)" DestinationFolder="$(PublishDir)" SkipUnchangedFiles="true" />
     </Target>
 
 </Project>
