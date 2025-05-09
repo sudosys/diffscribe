@@ -17,7 +17,7 @@ public class CommandMatcher
             { "help", new Lazy<ICommand>(() => new HelpCommand(this)) },
             { "version", new Lazy<ICommand>(() => new VersionCommand()) },
             { "update", new Lazy<ICommand>(() => new UpdateCommand(provider)) },
-            { "uninstall", new Lazy<ICommand>(() => new UninstallCommand()) },
+            { "uninstall", new Lazy<ICommand>(() => new UninstallCommand(provider)) },
         };
     }
 

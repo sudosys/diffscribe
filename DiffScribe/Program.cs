@@ -3,6 +3,7 @@ using DiffScribe.Configuration;
 using DiffScribe.Encryption;
 using DiffScribe.Git;
 using DiffScribe.Parser;
+using DiffScribe.Uninstall;
 using DiffScribe.Update;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -53,7 +54,8 @@ class Program
             .AddScoped<OpenAiClient>()
             .AddSingleton<CommitGenerator>()
             .AddSingleton<EncryptionService>()
-            .AddSingleton<AppUpdater>();
+            .AddSingleton<AppUpdater>()
+            .RegisterUninstallers();
         
         return serviceCollection;
     }

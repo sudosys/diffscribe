@@ -1,15 +1,18 @@
-using System.Diagnostics;
 using DiffScribe.Commands.Models;
+using DiffScribe.Uninstall;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace DiffScribe.Commands;
 
-public class UninstallCommand : ICommand
+public class UninstallCommand(IServiceProvider provider) : ICommand
 {
     public string Name => "uninstall";
     
     public string Description => "Uninstalls the CLI tool.";
 
     public CommandArgument[] DefinedArguments => [];
+    
+    private readonly IAppUninstaller _uninstaller = provider.GetRequiredService<IAppUninstaller>();
     
     public void Execute(Dictionary<string, object?> args)
     {
@@ -23,33 +26,6 @@ public class UninstallCommand : ICommand
 
         ConsoleWrapper.Info("Uninstallation has been started...");
 
-        var process = RunScript(GetScriptPath());
-        
-        var output = process?.StandardOutput.ReadToEnd();
-        var error = process?.StandardError.ReadToEnd();
-        
-        if (string.IsNullOrEmpty(error))
-        {
-            Console.WriteLine(output);
-            ConsoleWrapper.Success("Uninstallation was successful.");
-        }
-        else
-        {
-            ConsoleWrapper.Error(error);
-            ConsoleWrapper.Info("Uninstallation completed with errors. Please check the output above for more details.");
-        }
+        _uninstaller.Uninstall();
     }
-
-    private string GetScriptPath() => $"{AppContext.BaseDirectory}uninstall{ResolveScriptExtension()}";
-
-    private string ResolveScriptExtension() => OperatingSystem.IsWindows() ? ".ps1" : ".sh";
-
-    private Process? RunScript(string scriptPath) =>
-        Process.Start(new ProcessStartInfo
-        {
-            FileName = scriptPath,
-            UseShellExecute = false,
-            RedirectStandardOutput = true,
-            RedirectStandardError = true
-        });
 }

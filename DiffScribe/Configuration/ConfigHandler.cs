@@ -168,4 +168,16 @@ public class ConfigHandler
         => JsonSerializer.Deserialize<ToolConfiguration>(serialized, _serializerOptions)!;
     
     public bool IsApiKeySet() => !string.IsNullOrEmpty(Configuration.ApiKey);
+
+    public void RemoveConfiguration()
+    {
+        try
+        {
+            Directory.Delete(DiffScribeFolderPath, recursive: true);
+        }
+        catch (DirectoryNotFoundException e)
+        {
+            ConsoleWrapper.Error(e.Message);
+        }
+    }
 }
