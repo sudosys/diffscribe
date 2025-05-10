@@ -6,6 +6,8 @@ DEST="/usr/local/DiffScribe"
 sudo mkdir -p "$DEST"
 sudo cp -r "$SRC"/* "$DEST/"
 
+echo "Application files are copied to $DEST."
+
 case "$SHELL" in
     */zsh)   PROFILE="$HOME/.zprofile"      ;; # zsh
     */bash)  PROFILE="$HOME/.bash_profile"  ;; # bash
@@ -16,5 +18,7 @@ esac
 
 if ! grep -qs "$DEST" "$PROFILE"; then
     printf "\nexport PATH=\"\$PATH:$DEST\"" >> "$PROFILE"
-    echo "Added $DEST to PATH. Restart your session."
+    echo "$DEST is added to PATH. Restart your session."
 fi
+
+echo "Installation completed."

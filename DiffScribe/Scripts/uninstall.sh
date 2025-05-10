@@ -10,10 +10,14 @@ case "$SHELL" in
     *)       PROFILE="$HOME/.profile"       ;; # fallback
 esac
 
-sudo rm -rf "$DEST"
-echo "Removed $DEST and its contents."
-
 if grep -qs "$DEST" "$PROFILE"; then
-    sed -i.bak '/DiffScribe/d' "$PROFILE"
+    sed -i.bak '/DiffScribe/d' "$PROFILE" && rm "$PROFILE.bak"
     echo "$DEST removed from PATH. Restart your shell session."
+else
+    echo "$DEST not found in PATH."
 fi
+
+sudo rm -rf "$DEST"
+echo "Application files are removed from $DEST."
+
+echo "Uninstallation completed."
