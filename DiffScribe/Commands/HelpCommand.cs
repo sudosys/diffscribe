@@ -1,5 +1,5 @@
-using ConsoleTables;
 using DiffScribe.Commands.Models;
+using Spectre.Console;
 
 namespace DiffScribe.Commands;
 
@@ -41,15 +41,13 @@ public class HelpCommand : ICommand
 
     private void PrintCommandList()
     {
-        var table = CreateCommandsTable();
-        table.Write(Format.Minimal);
-        
+        AnsiConsole.Write(CreateCommandsTable());
         ConsoleWrapper.Info("To get help for a specific command: \"help --<command>\"");
     }
 
-    private ConsoleTable CreateCommandsTable()
+    private Table CreateCommandsTable()
     {
-        var table = new ConsoleTable("Command", "Description");
+        var table = new Table().AddColumns("Command", "Description");
         foreach (var arg in DefinedArguments)
         {
             _commandMatcher.TryMatch(ParseCmdName(arg.Name), out var cmd);
@@ -76,8 +74,7 @@ public class HelpCommand : ICommand
 
         if (cmd.DefinedArguments.Length > 0)
         {
-            var table = CreateCommandTable(cmd);
-            table.Write(Format.Minimal);
+            AnsiConsole.Write(CreateCommandTable(cmd));
         }
         else
         {
@@ -87,13 +84,17 @@ public class HelpCommand : ICommand
     
     private string ParseCmdName(string argument) => argument.TrimStart('-');
 
-    private ConsoleTable CreateCommandTable(ICommand command)
+    private Table CreateCommandTable(ICommand command)
     {
-        var table = new ConsoleTable("Argument", "Description", "Type", "Optional");
+        var table = new Table().AddColumns("Argument", "Description", "Type", "Optional");
 
         foreach (var commandArg in command.DefinedArguments)
         {
-            table.AddRow(commandArg.Name, commandArg.Description, commandArg.Type.Name, commandArg.Optional);
+            table.AddRow(
+                commandArg.Name,
+                commandArg.Description,
+                commandArg.Type.Name,
+                commandArg.Optional.ToString());
         }
         
         return table;

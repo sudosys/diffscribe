@@ -1,9 +1,9 @@
 using System.Reflection;
 using System.Text.Json;
-using ConsoleTables;
 using DiffScribe.Configuration.Enums;
 using DiffScribe.Encryption;
 using DiffScribe.Extensions;
+using Spectre.Console;
 
 namespace DiffScribe.Configuration;
 
@@ -65,19 +65,15 @@ public class ConfigHandler
         }
     }
 
-    public void PrintCurrentConfigAsTable()
-    {
-        var table = CreateConfigurationInformation();
-        
-        table.Write(Format.Minimal);
-    }
-    
-    private ConsoleTable CreateConfigurationInformation()
+    public void PrintCurrentConfigAsTable() 
+        => AnsiConsole.Write(CreateConfigurationInformation());
+
+    private Table CreateConfigurationInformation()
     {
         var type = Configuration.GetType();
         var properties = type.GetProperties();
 
-        var table = new ConsoleTable("Configuration", "Value");
+        var table = new Table().AddColumns("Configuration", "Value");
         foreach (var propertyInfo in properties)
         {
             table.AddRow(propertyInfo.Name.PascalToTitleCase(), GetPropertyValue(Configuration, propertyInfo));

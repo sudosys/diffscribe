@@ -1,9 +1,9 @@
-using ConsoleTables;
 using DiffScribe.AI;
 using DiffScribe.Commands.Models;
 using DiffScribe.Configuration;
 using DiffScribe.Git;
 using Microsoft.Extensions.DependencyInjection;
+using Spectre.Console;
 using TextCopy;
 
 namespace DiffScribe.Commands;
@@ -98,9 +98,10 @@ public class GenerateCommand(IServiceProvider provider) : ICommand
     private void PrintPostGeneration(string commitMessage)
     {
         Console.WriteLine();
-        new ConsoleTable("Generated commit message")
-            .AddRow(commitMessage)
-            .Write(Format.MarkDown);
+        AnsiConsole.Write(new Table()
+            .AddColumn("Generated commit message")
+            .AddRow(commitMessage));
+        Console.WriteLine();
     }
 
     private void CopyToClipboard(string commitMessage)
