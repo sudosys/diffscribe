@@ -26,7 +26,7 @@ public class UnixAppUninstaller(ConfigHandler configHandler, SecretKeyHandler se
         else
         {
             ConsoleWrapper.Error(error);
-            ConsoleWrapper.Info("Uninstallation completed with errors. Please check the output above for more details.");
+            ConsoleWrapper.Info("Uninstallation completed with errors. Please check the output above for details.");
         }
     }
     
