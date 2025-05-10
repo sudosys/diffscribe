@@ -119,16 +119,18 @@ public class GenerateCommand(IServiceProvider provider) : ICommand
         
         var proceed = 
             ConsoleWrapper.ShowConfirmation("Proceed to commit your changes with the message above?");
-            
-        if (proceed)
+
+        if (!proceed)
         {
-            var success = _gitRunner.Commit(commitMessage);
-            if (success)
-            {
-                ConsoleWrapper.Success("Changes are committed.");
-            }
+            return false;
         }
         
-        return proceed;
+        var committed = _gitRunner.Commit(commitMessage);
+        if (committed)
+        {
+            ConsoleWrapper.Success("Changes are committed.");
+        }
+
+        return true;
     }
 }
