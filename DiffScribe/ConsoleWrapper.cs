@@ -1,3 +1,5 @@
+using Spectre.Console;
+
 namespace DiffScribe;
 
 public static class ConsoleWrapper
@@ -86,5 +88,16 @@ public static class ConsoleWrapper
             default:
                 return ShowConfirmation(text);
         }
+    }
+
+    public static async Task ShowProgressBar(string title, Func<ProgressContext, Task> ctxAction)
+    {
+        AnsiConsole.MarkupLine(title);
+        await AnsiConsole.Progress()
+            .Columns(
+                new PercentageColumn(),
+                new ProgressBarColumn(),
+                new DownloadedColumn())
+            .StartAsync(ctxAction);
     }
 }

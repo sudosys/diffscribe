@@ -3,6 +3,7 @@ using System.Net;
 using System.Runtime.InteropServices;
 using System.Text.Json;
 using DiffScribe.Update.Models;
+using Spectre.Console;
 
 namespace DiffScribe.Update;
 
@@ -37,18 +38,15 @@ public abstract class AppUpdater
     #region Update Downloading
     public async Task DownloadInstallUpdate(string downloadUrl)
     {
-        ConsoleWrapper.Info("Downloading the new version.");
-
         using var client = GetHttpClient();
         client.DefaultRequestHeaders.Add("Accept", "application/octet-stream");
-        
-        using var response = await client.GetAsync(downloadUrl);
-        
+
+        using var response = await client.GetAsync(downloadUrl, HttpCompletionOption.ResponseHeadersRead);
         var zipPath = Path.GetTempFileName();
-        await using (var stream = File.Create(zipPath))
-        {
-            await response.Content.CopyToAsync(stream);
-        }
+
+        await ConsoleWrapper.ShowProgressBar(
+            "[bold underline]Downloading new version...[/]",
+            async ctx => await DownloadContentWithProgress(ctx, response.Content, zipPath));
 
         var tempPath = CreateTempDirectory();
         ZipFile.ExtractToDirectory(zipPath, tempPath);
@@ -67,6 +65,28 @@ public abstract class AppUpdater
         ConsoleWrapper.Success("New version has been installed successfully.");
         
         DoFileCleanup(zipPath, tempPath);
+    }
+
+    private async Task DownloadContentWithProgress(
+        ProgressContext ctx,
+        HttpContent content,
+        string zipPath)
+    {
+        var totalBytes = content.Headers.ContentLength ??= 0;
+        var responseStream = await content.ReadAsStreamAsync();
+        
+        var downloadTask = ctx.AddTask("Downloading...", maxValue: totalBytes);
+            
+        var buffer = new byte[81920];
+        var bytesRead = 1;
+        await using var fileStream = File.Create(zipPath);
+        while (bytesRead > 0)
+        {
+            bytesRead = await responseStream.ReadAsync(buffer);
+            await fileStream.WriteAsync(buffer.AsMemory(0, bytesRead));
+            
+            downloadTask.Increment(bytesRead);
+        }
     }
 
     private string CreateTempDirectory()
