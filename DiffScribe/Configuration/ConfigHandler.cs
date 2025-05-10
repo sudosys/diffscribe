@@ -56,7 +56,7 @@ public class ConfigHandler
         return Deserialize(serialized);
         ToolConfiguration TryCreateAndReadConfig()
         {
-            ConsoleWrapper.Warning("Configuration not found. Creating default configuration file.");
+            ConsoleWrapper.Info("Creating default configuration file.");
             TryCreateConfigFile();
             
             return ReadConfiguration();
