@@ -54,7 +54,7 @@ class Program
             .AddScoped<OpenAiClient>()
             .AddSingleton<CommitGenerator>()
             .AddSingleton<EncryptionService>()
-            .AddSingleton<AppUpdater>()
+            .RegisterUpdaters()
             .RegisterUninstallers();
         
         return serviceCollection;

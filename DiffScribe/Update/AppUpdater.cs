@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using System.IO.Compression;
 using System.Net;
 using System.Runtime.InteropServices;
@@ -7,7 +6,7 @@ using DiffScribe.Update.Models;
 
 namespace DiffScribe.Update;
 
-public class AppUpdater
+public abstract class AppUpdater
 {
     private const char VersionPrefix = 'v';
     
@@ -69,29 +68,9 @@ public class AppUpdater
         return extractPath;
     }
 
-    private string GetInstallationScript(string tempPath) 
-        => Directory.GetFiles(tempPath, "*.sh", SearchOption.AllDirectories)[0];
+    protected abstract string GetInstallationScript(string tempPath);
 
-    private async Task StartInstallation(string shFile)
-    {
-        using var process = Process.Start(
-            new ProcessStartInfo
-            {
-                FileName = "sh",
-                ArgumentList = { shFile },
-                WorkingDirectory = Path.GetDirectoryName(shFile),
-                RedirectStandardOutput = true,
-                RedirectStandardError = true
-            });
-        
-        var error = await process!.StandardError.ReadToEndAsync();
-        if (!string.IsNullOrEmpty(error))
-        {
-            ConsoleWrapper.Error(error);
-        }
-        
-        await process.WaitForExitAsync();
-    }
+    protected abstract Task StartInstallation(string script);
 
     private void DoFileCleanup(params string[] paths)
     {
@@ -169,9 +148,19 @@ public class AppUpdater
         return int.TryParse(concatVersion, out var versionNumber) ? versionNumber : 0;
     }
 
-    private string? ResolveAssetDownloadUrl(AppRelease release) =>
-        release.Assets
+    private string? ResolveAssetDownloadUrl(AppRelease release)
+    {
+        var assetUrl = release.Assets
             .SingleOrDefault(a => a.Name[..a.Name.LastIndexOf('.')].EndsWith(RuntimeInformation.RuntimeIdentifier))
             ?.DownloadUrl;
+
+        if (assetUrl is null)
+        {
+            ConsoleWrapper.Error("Could not find a suitable version for your system.");
+            return null;
+        }
+        
+        return assetUrl;
+    }
     #endregion
 }
