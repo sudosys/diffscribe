@@ -27,14 +27,16 @@ public class ConfigHandler
     private const string SetValuePlaceHolder = "<SET>";
     private const string NotSetValuePlaceHolder = "<NOT SET>";
 
-    private readonly EncryptionService _encryptionService;
+    private readonly AesEncryptor _aesEncryptor;
+    private readonly SecretKeyHandler _secretKeyHandler;
     
     public ToolConfiguration Configuration { get; }
 
-    public ConfigHandler(EncryptionService encryptionService)
+    public ConfigHandler(AesEncryptor aesEncryptor, SecretKeyHandler secretKeyHandler)
     {
         Configuration = ReadConfiguration();
-        _encryptionService = encryptionService ?? throw new ArgumentNullException(nameof(encryptionService));
+        _aesEncryptor = aesEncryptor ?? throw new ArgumentNullException(nameof(aesEncryptor));
+        _secretKeyHandler = secretKeyHandler ?? throw new ArgumentNullException(nameof(secretKeyHandler));
     }
     
     private ToolConfiguration ReadConfiguration()
@@ -145,15 +147,15 @@ public class ConfigHandler
     #region API Key
     public void UpdateApiKey(string apiKey)
     {
-        _encryptionService.UpdateSecretKey();
+        _secretKeyHandler.CreateKey();
         
-        var encrypted = _encryptionService.EncryptText(apiKey);
+        var encrypted = _aesEncryptor.EncryptText(apiKey);
         
         Configuration.ApiKey = encrypted;
     }
 
     public string ReadApiKey() 
-        => _encryptionService.DecryptText(Configuration.ApiKey);
+        => _aesEncryptor.DecryptText(Configuration.ApiKey);
     #endregion
 
     public void UpdateConfiguration() => WriteToFile(Serialize(Configuration));

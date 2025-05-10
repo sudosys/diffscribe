@@ -53,7 +53,8 @@ class Program
             .AddSingleton<GitRunner>()
             .AddScoped<OpenAiClient>()
             .AddSingleton<CommitGenerator>()
-            .AddSingleton<EncryptionService>()
+            .AddSingleton<AesEncryptor>()
+            .RegisterSecretKeyHandlers()
             .RegisterUpdaters()
             .RegisterUninstallers();
         
