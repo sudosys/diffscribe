@@ -1,0 +1,47 @@
+name: Build & Publish Cross-Platform Artifacts
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  publish:
+    name: Publish (${{ matrix.runtime }})
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        runtime: [ win-x64, linux-x64, osx-x64, osx-arm64 ]
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.x'
+
+    - name: Restore dependencies
+      run: dotnet restore
+
+    - name: Publish for ${{ matrix.runtime }}
+      run: |
+        dotnet publish -r ${{ matrix.runtime }} \
+          --configuration Release \
+          --self-contained true \
+          --output ./publish/${{ matrix.runtime }}
+
+    - name: Compress output
+      run: |
+        cd publish
+        zip -r ${{ matrix.runtime }}.zip ${{ matrix.runtime }}
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ matrix.runtime }}
+        path: publish/${{ matrix.runtime }}.zip
+        retention-days: 7
