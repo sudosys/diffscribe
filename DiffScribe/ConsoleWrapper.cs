@@ -55,19 +55,13 @@ public static class ConsoleWrapper
 
     public static bool ShowConfirmation(string text)
     {
-        Console.Write($"{text} [y/N]: ");
-
-        var input = Console.ReadLine();
-
-        switch (input?.ToLower())
-        {
-            case "y":
-                return true;
-            case "n" or "":
-                return false;
-            default:
-                return ShowConfirmation(text);
-        }
+        return AnsiConsole.Prompt(
+            new TextPrompt<bool>(text)
+                .AddChoice(true)
+                .AddChoice(false)
+                .DefaultValue(false)
+                .ShowChoices(true)
+                .WithConverter(choice => choice ? "y" : "n"));
     }
 
     public static async Task ShowProgressBar(string title, Func<ProgressContext, Task> ctxAction)
