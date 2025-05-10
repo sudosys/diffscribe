@@ -4,8 +4,7 @@ namespace DiffScribe.Update;
 
 public class WindowsAppUpdater : AppUpdater
 {
-    protected override string GetInstallationScript(string tempPath) 
-        => Directory.GetFiles(tempPath, "*.ps1", SearchOption.AllDirectories)[0];
+    protected override string InstallationScriptName => "install.ps1";
 
     protected override Task StartInstallation(string script)
     {

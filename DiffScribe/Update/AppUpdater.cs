@@ -9,6 +9,8 @@ namespace DiffScribe.Update;
 public abstract class AppUpdater
 {
     private const char VersionPrefix = 'v';
+
+    protected abstract string InstallationScriptName { get; }
     
     private readonly string[] _updateIgnoredCommands =
     [
@@ -53,8 +55,14 @@ public abstract class AppUpdater
         
         ConsoleWrapper.Info("Download finished, installing the new version.");
 
-        var shFile = GetInstallationScript(tempPath);
-        await StartInstallation(shFile);
+        var scriptFile = GetInstallationScript(tempPath);
+        if (scriptFile is null)
+        {
+            ConsoleWrapper.Error("Installation script could not be found. Aborting update...");
+            return;
+        }
+        
+        await StartInstallation(scriptFile);
         
         ConsoleWrapper.Success("New version has been installed successfully.");
         
@@ -68,7 +76,8 @@ public abstract class AppUpdater
         return extractPath;
     }
 
-    protected abstract string GetInstallationScript(string tempPath);
+    private string? GetInstallationScript(string tempPath) 
+        => Directory.GetFiles(tempPath, InstallationScriptName, SearchOption.AllDirectories).SingleOrDefault();
 
     protected abstract Task StartInstallation(string script);
 

@@ -4,8 +4,7 @@ namespace DiffScribe.Update;
 
 public class UnixAppUpdater : AppUpdater
 {
-    protected override string GetInstallationScript(string tempPath) 
-        => Directory.GetFiles(tempPath, "*.sh", SearchOption.AllDirectories)[0];
+    protected override string InstallationScriptName => "install.sh";
 
     protected override async Task StartInstallation(string script)
     {
