@@ -1,22 +1,25 @@
 using System.Diagnostics;
 using DiffScribe.Configuration;
+using DiffScribe.Encryption;
 
 namespace DiffScribe.Uninstall;
 
-public class WindowsAppUninstaller(ConfigHandler configHandler) : IAppUninstaller
+public class WindowsAppUninstaller(ConfigHandler configHandler, SecretKeyHandler secretKeyHandler)
+    : AppUninstaller(configHandler, secretKeyHandler)
 {
-    public string UninstallScriptPath => $"{AppContext.BaseDirectory}uninstall.ps1";
+    protected override string UninstallScriptPath => $"{AppContext.BaseDirectory}uninstall.ps1";
     
-    public void Uninstall()
+    public override void Uninstall()
     {
-        configHandler.RemoveConfiguration();
+        base.Uninstall();
+        
         Process.Start(GetProcessStartInfo());
         
         ConsoleWrapper.Info("Uninstallation script has been started. Exiting application...");
         Environment.Exit(0);
     }
     
-    public ProcessStartInfo GetProcessStartInfo() =>
+    protected override ProcessStartInfo GetProcessStartInfo() =>
         new()
         {
             FileName = "powershell",

@@ -9,7 +9,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<WindowsAppUninstaller>();
         services.AddSingleton<UnixAppUninstaller>();
 
-        services.AddSingleton<IAppUninstaller>(sp =>
+        services.AddSingleton<AppUninstaller>(sp =>
         {
             if (OperatingSystem.IsWindows())
             {

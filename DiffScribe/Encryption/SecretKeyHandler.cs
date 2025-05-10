@@ -54,4 +54,16 @@ public abstract class SecretKeyHandler
         File.SetAttributes(SecretKeyDirectory, FileAttributes.Hidden);
         File.SetAttributes(SecretKeyFilePath, FileAttributes.Hidden);
     }
+    
+    public void DeleteKey()
+    {
+        try
+        {
+            Directory.Delete(SecretKeyDirectory, recursive: true);
+        }
+        catch (Exception)
+        {
+            // ignored
+        }
+    }
 }

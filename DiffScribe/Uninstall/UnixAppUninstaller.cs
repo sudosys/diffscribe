@@ -1,16 +1,19 @@
 using System.Diagnostics;
 using DiffScribe.Configuration;
+using DiffScribe.Encryption;
 
 namespace DiffScribe.Uninstall;
 
-public class UnixAppUninstaller(ConfigHandler configHandler) : IAppUninstaller
+public class UnixAppUninstaller(ConfigHandler configHandler, SecretKeyHandler secretKeyHandler)
+    : AppUninstaller(configHandler, secretKeyHandler)
 {
-    public string UninstallScriptPath => $"{AppContext.BaseDirectory}uninstall.sh";
+    protected override string UninstallScriptPath => $"{AppContext.BaseDirectory}uninstall.sh";
     
-    public void Uninstall()
+    public override void Uninstall()
     {
+        base.Uninstall();
+        
         var process = Process.Start(GetProcessStartInfo());
-        configHandler.RemoveConfiguration();
         
         var output = process?.StandardOutput.ReadToEnd();
         var error = process?.StandardError.ReadToEnd();
@@ -27,7 +30,7 @@ public class UnixAppUninstaller(ConfigHandler configHandler) : IAppUninstaller
         }
     }
     
-    public ProcessStartInfo GetProcessStartInfo() =>
+    protected override ProcessStartInfo GetProcessStartInfo() =>
         new()
         {
             FileName = UninstallScriptPath,

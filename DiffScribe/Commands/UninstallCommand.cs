@@ -12,7 +12,7 @@ public class UninstallCommand(IServiceProvider provider) : ICommand
 
     public CommandArgument[] DefinedArguments => [];
     
-    private readonly IAppUninstaller _uninstaller = provider.GetRequiredService<IAppUninstaller>();
+    private readonly AppUninstaller _uninstaller = provider.GetRequiredService<AppUninstaller>();
     
     public void Execute(Dictionary<string, object?> args)
     {
