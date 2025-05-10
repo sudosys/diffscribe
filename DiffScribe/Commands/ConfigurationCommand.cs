@@ -4,6 +4,7 @@ using DiffScribe.Configuration;
 using DiffScribe.Configuration.Enums;
 using DiffScribe.Extensions;
 using Microsoft.Extensions.DependencyInjection;
+using Spectre.Console;
 
 namespace DiffScribe.Commands;
 
@@ -29,21 +30,21 @@ public class ConfigurationCommand(IServiceProvider provider) : ICommand
     private readonly ConfigHandler _configHandler = provider.GetRequiredService<ConfigHandler>();
     private readonly OpenAiClient _openAiClient = provider.GetRequiredService<OpenAiClient>();
     
-    private readonly string[] _commitStyleSelections =
-    [
-        $"{CommitStyle.Minimal} (Short, one-line commit message.)",
-        $"{CommitStyle.Standard} (Clear commit message with brief context.)",
-        $"{CommitStyle.Detailed} (Descriptive commit message followed by an in-depth explanation.)"
-    ];
-    
-    private readonly string[] _llmSelections =
-    [
-        $"{LlmModel.Gpt4o.ToDisplayName()} ({LlmModel.Gpt4o.GetStats()})",
-        $"{LlmModel.Gpt4oMini.ToDisplayName()} ({LlmModel.Gpt4oMini.GetStats()})",
-        $"{LlmModel.Gpt4_1.ToDisplayName()} ({LlmModel.Gpt4_1.GetStats()})",
-        $"{LlmModel.Gpt4_1Mini.ToDisplayName()} ({LlmModel.Gpt4_1Mini.GetStats()})",
-        $"{LlmModel.Gpt4_1Nano.ToDisplayName()} ({LlmModel.Gpt4_1Nano.GetStats()})",
-    ];
+    private Dictionary<CommitStyle, string> _commitStyleSelections = new()
+    {
+        { CommitStyle.Minimal, $"{CommitStyle.Minimal} (Short, one-line commit message.)" },
+        { CommitStyle.Standard, $"{CommitStyle.Standard} (Clear commit message with brief context.)" },
+        { CommitStyle.Detailed, $"{CommitStyle.Detailed} (Descriptive commit message followed by an in-depth explanation.)" },
+    };
+
+    private Dictionary<LlmModel, string> _llmSelections = new()
+    {
+        { LlmModel.Gpt4o, $"{LlmModel.Gpt4o.ToDisplayName()} ({LlmModel.Gpt4o.GetStats()})" },
+        { LlmModel.Gpt4oMini, $"{LlmModel.Gpt4oMini.ToDisplayName()} ({LlmModel.Gpt4oMini.GetStats()})" },
+        { LlmModel.Gpt4_1, $"{LlmModel.Gpt4_1.ToDisplayName()} ({LlmModel.Gpt4_1.GetStats()})" },
+        { LlmModel.Gpt4_1Mini, $"{LlmModel.Gpt4_1Mini.ToDisplayName()} ({LlmModel.Gpt4_1Mini.GetStats()})" },
+        { LlmModel.Gpt4_1Nano, $"{LlmModel.Gpt4_1Nano.ToDisplayName()} ({LlmModel.Gpt4_1Nano.GetStats()})" }
+    };
 
     public void Execute(Dictionary<string, object?> args)
     {
@@ -101,22 +102,20 @@ public class ConfigurationCommand(IServiceProvider provider) : ICommand
     }
 
     private void MakeCommitStyleSelection(ref ToolConfiguration toolConfig)
-    {
-        _commitStyleSelections.UpdateSelectedOption<CommitStyle>(toolConfig.CommitStyle);
+    { 
+       EnumExtensions.UpdateSelectedOption(ref _commitStyleSelections, toolConfig.CommitStyle);
 
-        var selectedIdx = ConsoleWrapper.ShowSelectionList(
-            _commitStyleSelections,
-            title: "Select a commit style that fits your needs:");
-
-        if (selectedIdx == -1)
-        {
-            return;
-        }
-
-        var updatedStyle = ((CommitStyle)selectedIdx).ToString();
-        toolConfig.CommitStyle = updatedStyle;
-        
-        ConsoleWrapper.Info($"Commit style has been updated to \"{updatedStyle}\".");
+       var selection = AnsiConsole.Prompt(new SelectionPrompt<string>()
+            .Title("Select a commit style that fits your needs:")
+            .AddChoices(_commitStyleSelections.Values));
+       
+       var selectedCommitStyle = _commitStyleSelections
+           .First(p => p.Value == selection)
+           .Key
+           .ToString();
+       
+       toolConfig.CommitStyle = selectedCommitStyle;
+       ConsoleWrapper.Info($"Commit style has been updated to \"{selectedCommitStyle}\".");
     }
 
     private void UpdateApiKey(string apiKey)
@@ -134,20 +133,17 @@ public class ConfigurationCommand(IServiceProvider provider) : ICommand
 
     private void MakeModelSelection(ref ToolConfiguration toolConfig)
     {
-        _llmSelections.UpdateSelectedOption<LlmModel>(toolConfig.Llm);
-
-        var selectedIdx = ConsoleWrapper.ShowSelectionList(
-            _llmSelections,
-            title: "Select a model for commit message generation:");
-
-        if (selectedIdx == -1)
-        {
-            return;
-        }
-
-        var updatedModel = (LlmModel)selectedIdx;
-        toolConfig.Llm = updatedModel.ToString();
+        EnumExtensions.UpdateSelectedOption(ref _llmSelections, toolConfig.Llm);
         
-        ConsoleWrapper.Info($"Model has been updated to \"{updatedModel.ToDisplayName()}\".");
+        var selection = AnsiConsole.Prompt(new SelectionPrompt<string>()
+            .Title("Select a model for commit message generation:")
+            .AddChoices(_llmSelections.Values));
+       
+        var selectedLlm = _llmSelections
+            .First(p => p.Value == selection)
+            .Key;
+
+        toolConfig.Llm = selectedLlm.ToString();
+        ConsoleWrapper.Info($"Model has been updated to \"{selectedLlm.ToDisplayName()}\".");
     }
 }

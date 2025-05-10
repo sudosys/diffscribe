@@ -1,4 +1,5 @@
 using DiffScribe.Configuration.Enums;
+using Spectre.Console;
 
 namespace DiffScribe.Extensions;
 
@@ -24,13 +25,21 @@ public static class EnumExtensions
         _ => throw new ArgumentOutOfRangeException(nameof(model))
     };
     
-    public static void UpdateSelectedOption<T>(this string[] selections, string value) where T : struct, Enum
+    public static void UpdateSelectedOption<T>(ref Dictionary<T, string> selections, string value) where T : struct, Enum
     {
-        if (Enum.TryParse(value, out T enumValue))
+        if (!Enum.TryParse(value, out T enumValue))
         {
-            var configuredOptionIdx = Convert.ToInt32(enumValue);
-            selections[configuredOptionIdx] = $"[X] {selections[configuredOptionIdx]}";
+            return;
         }
+        
+        var configuredOptionIdx = Convert.ToInt32(enumValue);
+
+        selections = selections
+            .Select(p 
+                => (p.Key, Convert.ToInt32(p.Key) == configuredOptionIdx ? 
+                            Markup.Escape($"[X] {p.Value}") :
+                            p.Value))
+            .ToDictionary();
     }
 
     public static string ParseApiName(this string configuredLlm) =>
