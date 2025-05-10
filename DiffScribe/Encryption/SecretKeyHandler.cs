@@ -7,7 +7,7 @@ public abstract class SecretKeyHandler
     private const string SecretFileName = ".secret";
     
     private static readonly string SecretKeyDirectory = Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
         ".dsc");
     
     protected readonly string SecretKeyFilePath = Path.Combine(SecretKeyDirectory, SecretFileName);

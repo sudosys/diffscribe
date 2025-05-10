@@ -12,7 +12,7 @@ public class ConfigHandler
     private const string ConfigFileName = ".dsc_config";
 
     private static readonly string DiffScribeFolderPath =
-        $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}{Path.DirectorySeparatorChar}DiffScribe";
+        $"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}{Path.DirectorySeparatorChar}DiffScribe";
     
     private static readonly string ConfigFilePath = 
         $"{DiffScribeFolderPath}{Path.DirectorySeparatorChar}{ConfigFileName}";
