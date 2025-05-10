@@ -20,12 +20,6 @@ public class WindowsSecretKeyHandler : SecretKeyHandler
         var fileSecurity = new FileSecurity();
         fileSecurity.SetAccessRuleProtection(true, false);
         
-        var everyone = new SecurityIdentifier(WellKnownSidType.WorldSid, null);
-        fileSecurity.AddAccessRule(new FileSystemAccessRule(
-            everyone,
-            FileSystemRights.FullControl,
-            AccessControlType.Deny));
-        
         var currentUser = WindowsIdentity.GetCurrent().User;
         if (currentUser != null)
         {
