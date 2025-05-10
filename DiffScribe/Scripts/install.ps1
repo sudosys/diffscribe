@@ -1,7 +1,8 @@
 $source = Split-Path -Parent $MyInvocation.MyCommand.Path
 $dest = "$env:ProgramFiles\DiffScribe"
 
-Copy-Item -Recurse -Force $source $dest
+New-Item -Path $dest -ItemType Directory -Force > $null
+Copy-Item -Recurse -Force "$source\*" $dest
 
 $currPath = [Environment]::GetEnvironmentVariable("Path", [System.EnvironmentVariableTarget]::Machine)
 if (-not ($currPath -split ";" | Where-Object { $_ -eq $dest })) {
@@ -10,3 +11,5 @@ if (-not ($currPath -split ";" | Where-Object { $_ -eq $dest })) {
 } else {
     Write-Output "$dest is already in the PATH."
 }
+
+Read-Host "Press Enter to exit"
