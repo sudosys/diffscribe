@@ -64,9 +64,8 @@ public static class ConsoleWrapper
                 .WithConverter(choice => choice ? "y" : "n"));
     }
 
-    public static async Task ShowProgressBar(string title, Func<ProgressContext, Task> ctxAction)
+    public static async Task ShowProgressBar(Func<ProgressContext, Task> ctxAction)
     {
-        AnsiConsole.MarkupLine(title);
         await AnsiConsole.Progress()
             .Columns(
                 new PercentageColumn(),

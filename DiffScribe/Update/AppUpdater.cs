@@ -45,7 +45,6 @@ public abstract class AppUpdater
         var zipPath = Path.GetTempFileName();
 
         await ConsoleWrapper.ShowProgressBar(
-            "[bold underline]Downloading new version...[/]",
             async ctx => await DownloadContentWithProgress(ctx, response.Content, zipPath));
 
         var tempPath = CreateTempDirectory();
@@ -75,7 +74,7 @@ public abstract class AppUpdater
         var totalBytes = content.Headers.ContentLength ??= 0;
         var responseStream = await content.ReadAsStreamAsync();
         
-        var downloadTask = ctx.AddTask("Downloading...", maxValue: totalBytes);
+        var downloadTask = ctx.AddTask("Downloading the new version...", maxValue: totalBytes);
             
         var buffer = new byte[81920];
         var bytesRead = 1;
