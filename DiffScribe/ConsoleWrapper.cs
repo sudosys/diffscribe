@@ -68,9 +68,11 @@ public static class ConsoleWrapper
     {
         await AnsiConsole.Progress()
             .Columns(
+                new TaskDescriptionColumn(),
                 new PercentageColumn(),
                 new ProgressBarColumn(),
-                new DownloadedColumn())
+                new DownloadedColumn(),
+                new RemainingTimeColumn())
             .StartAsync(ctxAction);
     }
 }
