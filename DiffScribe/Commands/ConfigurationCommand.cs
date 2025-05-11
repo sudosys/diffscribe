@@ -12,7 +12,7 @@ public class ConfigurationCommand(IServiceProvider provider) : ICommand
 {
     public string Name => "config";
     
-    public string Description => "Display & edit tool configuration.";
+    public string Description => "Displays or edits tool configuration.";
     
     private const string CommitStyleArg = "--commit-style";
     private const string ApiKeyArg = "--api-key";
