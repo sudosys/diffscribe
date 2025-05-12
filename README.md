@@ -15,9 +15,10 @@ It helps turn diffs into clear commit messages quickly and easily.
 
 ## 2. Installation
 
-1. Download the latest release from [here](https://github.com/sudosys/diffscribe/releases).
-2. Extract it and `cd` into the extracted folder.
-3. Run the platform-specific installer script from inside that folder:
+1. Download the latest release from [here](https://github.com/sudosys/diffscribe/releases) and extract it.
+2. Open up a terminal on Linux/macOS or PowerShell (as admin) on Windows.
+3. Change the working directory to the extracted folder.
+4. Run the platform-specific installer script from inside that folder:
 
 ```powershell
 # Windows
