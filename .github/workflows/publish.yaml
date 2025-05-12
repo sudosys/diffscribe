@@ -1,4 +1,4 @@
-name: Build & Publish Cross-Platform Artifacts
+name: Publish Cross-Platform Builds
 
 on:
   push:
@@ -7,41 +7,54 @@ on:
 
 jobs:
   publish:
-    name: Publish (${{ matrix.runtime }})
-    runs-on: ubuntu-latest
+    name: Publish (${{ matrix.rid }})
+    runs-on: ${{ matrix.os }}
 
     strategy:
       fail-fast: false
       matrix:
-        runtime: [ win-x64, linux-x64, osx-x64, osx-arm64 ]
+        include:
+          - rid: win-x64
+            os: ubuntu-latest
+          - rid: linux-x64
+            os: ubuntu-latest
+          - rid: osx-x64
+            os: macos-latest
+          - rid: osx-arm64
+            os: macos-latest
 
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        fetch-tags: true
 
+    - name: Read version
+      id: read_version
+      run: echo version=$(git tag --sort=-creatordate | head -n 1) >> $GITHUB_OUTPUT
+      
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: '8.x'
 
     - name: Restore dependencies
+      working-directory: ./DiffScribe
       run: dotnet restore
 
-    - name: Publish for ${{ matrix.runtime }}
+    - name: Publish for ${{ matrix.rid }}
+      working-directory: ./DiffScribe
       run: |
-        dotnet publish -r ${{ matrix.runtime }} \
+        dotnet publish DiffScribe.csproj -r ${{ matrix.rid }} \
+          --no-restore \
           --configuration Release \
           --self-contained true \
-          --output ./publish/${{ matrix.runtime }}
-
-    - name: Compress output
-      run: |
-        cd publish
-        zip -r ${{ matrix.runtime }}.zip ${{ matrix.runtime }}
+          --output ./publish/${{ matrix.rid }}
 
     - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
-        name: ${{ matrix.runtime }}
-        path: publish/${{ matrix.runtime }}.zip
+        name: dsc-${{ steps.read_version.outputs.version }}-${{ matrix.rid }}
+        path: ./DiffScribe/publish/${{ matrix.rid }}
         retention-days: 7

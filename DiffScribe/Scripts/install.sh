@@ -3,6 +3,10 @@
 SRC="$(pwd)"
 DEST="/usr/local/DiffScribe"
 
+if [ "$(uname)" = "Darwin" ]; then 
+  xattr -dr com.apple.quarantine .
+fi
+
 sudo mkdir -p "$DEST"
 sudo cp -r "$SRC"/* "$DEST/"
 
