@@ -18,16 +18,18 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
-
+      
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: '8.x'
 
     - name: Restore dependencies
+      working-directory: ./DiffScribe
       run: dotnet restore
 
     - name: Publish for ${{ matrix.runtime }}
+      working-directory: ./DiffScribe
       run: |
         dotnet publish -r ${{ matrix.runtime }} \
           --configuration Release \
@@ -35,6 +37,7 @@ jobs:
           --output ./publish/${{ matrix.runtime }}
 
     - name: Compress output
+      working-directory: ./DiffScribe
       run: |
         cd publish
         zip -r ${{ matrix.runtime }}.zip ${{ matrix.runtime }}
@@ -43,5 +46,5 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: ${{ matrix.runtime }}
-        path: publish/${{ matrix.runtime }}.zip
+        path: ./DiffScribe/publish/${{ matrix.runtime }}.zip
         retention-days: 7
