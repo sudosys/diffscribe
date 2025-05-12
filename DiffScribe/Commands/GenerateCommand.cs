@@ -38,18 +38,7 @@ public class GenerateCommand(IServiceProvider provider) : ICommand
             return;
         }
 
-        var source = new CancellationTokenSource();
-
-        string commitMessage;
-        try
-        {
-            commitMessage = GenerateCommitMessage(source.Token);
-        }
-        finally
-        {
-            Console.WriteLine();
-            source.Cancel();
-        }
+        var commitMessage = GenerateCommitMessage();
         
         PrintPostGeneration(commitMessage);
         
@@ -84,14 +73,17 @@ public class GenerateCommand(IServiceProvider provider) : ICommand
         return true;
     }
 
-    private string GenerateCommitMessage(CancellationToken cancellationToken)
+    private string GenerateCommitMessage()
     {
-        ConsoleWrapper.ShowLoadingText("Generating commit message based on your changes", cancellationToken);
+        var commitMessage = string.Empty;
+        ConsoleWrapper.TakeActionWithLoadingText(() =>
+        {
+            var stagedDiffs = _gitRunner.GetStagedDiffs();
         
-        var stagedDiffs = _gitRunner.GetStagedDiffs();
+            commitMessage =  _commitGenerator.GenerateCommitMessage(stagedDiffs);
+        },
+        "Generating commit message based on your changes");
         
-        var commitMessage =  _commitGenerator.GenerateCommitMessage(stagedDiffs);
-
         return commitMessage;
     }
 

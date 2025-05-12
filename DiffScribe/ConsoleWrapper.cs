@@ -33,23 +33,17 @@ public static class ConsoleWrapper
         Console.WriteLine(line);
     }
 
-    public static void ShowLoadingText(string text, CancellationToken cancellationToken)
+    public static void TakeActionWithLoadingText(Action action, string text)
     {
         AnsiConsole
             .Status()
             .Spinner(Spinner.Known.Dots)
             .SpinnerStyle(Style.Parse("blue"))
-            .StartAsync(text, async _ =>
+            .Start(text, ctx =>
             {
-                while (true)
-                {
-                    await Task.Delay(500, cancellationToken);
+                action();
 
-                    if (cancellationToken.IsCancellationRequested)
-                    {
-                        break;
-                    }
-                }
+                ctx.Status = "Done";
             });
     }
 
