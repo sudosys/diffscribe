@@ -24,8 +24,8 @@ public class ConfigHandler
     };
 
     private const int MaxValueColumnWidth = 25; 
-    private const string SetValuePlaceHolder = "<SET>";
-    private const string NotSetValuePlaceHolder = "<NOT SET>";
+    private const string SetValuePlaceHolder = "[green]<SET>[/]";
+    private const string NotSetValuePlaceHolder = "[red]<NOT SET>[/]";
 
     private readonly AesEncryptor _aesEncryptor;
     private readonly SecretKeyHandler _secretKeyHandler;
@@ -88,13 +88,13 @@ public class ConfigHandler
 
         if (value is not string stringValue)
         {
-            return value?.ToString() ?? NotSetValuePlaceHolder;
+            return value is null ? NotSetValuePlaceHolder : Markup.Escape(value.ToString()!);
         }
 
         return stringValue.Length switch
         {
             > 0 when propertyInfo.Name == nameof(toolConfig.ApiKey) => SetValuePlaceHolder,
-            > 0 => TryTruncateValue(stringValue),
+            > 0 => Markup.Escape(TryTruncateValue(stringValue)),
             _ => NotSetValuePlaceHolder
         };
     }
@@ -137,7 +137,8 @@ public class ConfigHandler
             commitStyle: nameof(CommitStyle.Standard),
             autoCommit: false,
             apiKey: string.Empty,
-            llm: nameof(LlmModel.Gpt4oMini));
+            llm: nameof(LlmModel.Gpt5_6Luna),
+            commitLength: nameof(CommitLength.Standard));
     }
 
     #region API Key

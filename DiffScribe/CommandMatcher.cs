@@ -1,4 +1,5 @@
 using DiffScribe.Commands;
+using DiffScribe.Suggestions;
 
 namespace DiffScribe;
 
@@ -43,12 +44,17 @@ public class CommandMatcher
                     .Where(k => k.StartsWith(commandName))
                     .ToList();
 
-                if (possibleKeys.Count > 1)
+                switch (possibleKeys.Count)
                 {
-                    ConsoleWrapper
-                        .Error($"Ambiguous command: {commandName}. Possible matches are: {string.Join(", ", possibleKeys)}");
-                    command = null;
-                    return false;
+                    case 0:
+                        ReportUnknownCommand(commandName);
+                        command = null;
+                        return false;
+                    case > 1:
+                        ConsoleWrapper
+                            .Error($"Ambiguous command: {commandName}. Possible matches are: {string.Join(", ", possibleKeys)}");
+                        command = null;
+                        return false;
                 }
             
                 return GetMappedCommand(possibleKeys.Single(), out command);
@@ -59,11 +65,22 @@ public class CommandMatcher
                 
                 if (command is null)
                 {
-                    ConsoleWrapper.Error($"Unknown command: {commandName}");
+                    ReportUnknownCommand(commandName);
                     return false;   
                 }
                 return true;
         }
+    }
+
+    private void ReportUnknownCommand(string commandName)
+    {
+        ConsoleWrapper.Error($"Unknown command: {commandName}");
+
+        var recommendation = SuggestionEngine.BuildRecommendation(commandName, GetDefinedCommandNames());
+
+        ConsoleWrapper.Info(string.IsNullOrEmpty(recommendation)
+            ? $"Run \"{AppInfo.ExecutableName} help\" to see the available commands."
+            : recommendation);
     }
     
     public string[] GetDefinedCommandNames() 
