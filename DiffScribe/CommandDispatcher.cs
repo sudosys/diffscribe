@@ -7,7 +7,7 @@ public class CommandDispatcher(ArgumentValidator argumentValidator)
 {
     public void Dispatch(CommandInfo commandInfo, ICommand command)
     {
-        if (!argumentValidator.Validate(command.DefinedArguments, commandInfo.Arguments))
+        if (!argumentValidator.Validate(command, commandInfo.Arguments))
         {
             return;
         }

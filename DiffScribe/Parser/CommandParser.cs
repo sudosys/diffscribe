@@ -2,6 +2,8 @@ namespace DiffScribe.Parser;
 
 public class CommandParser
 {
+    private const string ArgumentPrefix = "--";
+    
     private readonly CommandInfo _rootCommandInfo = new(string.Empty, []);
    
     public CommandInfo Parse(string[] args)
@@ -25,24 +27,34 @@ public class CommandParser
         var argsLength = args.Length;
         for (var i = 0; i < argsLength; i++)
         {
-            if (!args[i].StartsWith("--"))
+            if (!IsArgumentName(args[i]))
             {
                 continue;
             }
+
+            var argumentName = args[i];
+            List<string> valueTokens = [];
             
-            if (i + 1 < argsLength && !args[i + 1].StartsWith("--"))
+            // Every token until the next argument belongs to the current one, 
+            // which keeps unquoted values such as "--steer keep it short" intact.
+            while (i + 1 < argsLength && !IsArgumentName(args[i + 1]))
             {
-                parsedArgs.Add(args[i], ParseValue(args[i + 1]));
+                valueTokens.Add(args[i + 1]);
                 i++;
             }
-            else
+
+            parsedArgs[argumentName] = valueTokens.Count switch
             {
-                parsedArgs.Add(args[i], null);
-            }
+                0 => null,
+                1 => ParseValue(valueTokens[0]),
+                _ => string.Join(' ', valueTokens)
+            };
         }
 
         return parsedArgs;
     }
+
+    private bool IsArgumentName(string token) => token.StartsWith(ArgumentPrefix);
 
     private object ParseValue(string value)
     {

@@ -2,9 +2,8 @@ namespace DiffScribe.Configuration.Enums;
 
 public enum LlmModel
 {
-    Gpt4o,
-    Gpt4oMini,
-    Gpt4_1,
-    Gpt4_1Mini,
-    Gpt4_1Nano,
+    Gpt5_6Terra,
+    Gpt5_6Luna,
+    Gpt5_4Mini,
+    Gpt5_4Nano,
 }

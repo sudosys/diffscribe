@@ -15,13 +15,17 @@ public class ConfigurationCommand(IServiceProvider provider) : ICommand
     public string Description => "Displays or edits tool configuration.";
     
     private const string CommitStyleArg = "--commit-style";
+    private const string CommitLengthArg = "--commit-len";
     private const string ApiKeyArg = "--api-key";
     private const string LlmArg = "--llm";
     private const string AutoCommitArg = "--auto-commit";
 
+    private const string CustomCommitLengthOption = "Custom (Set your own subject line length.)";
+
     public CommandArgument[] DefinedArguments => 
         [
             new(CommitStyleArg, "Set the commit style to specify the verbosity of the commit message.", typeof(void), optional: true),
+            new(CommitLengthArg, "Set the maximum length of the commit message subject line.", typeof(void), optional: true),
             new(ApiKeyArg, "Set the OpenAI API key.", typeof(string), optional: true),
             new(LlmArg, "Select the OpenAI model to be used for generation.", typeof(void), optional: true),
             new(AutoCommitArg, "Commit automatically after generation.", typeof(bool), optional: true),
@@ -30,21 +34,16 @@ public class ConfigurationCommand(IServiceProvider provider) : ICommand
     private readonly ConfigHandler _configHandler = provider.GetRequiredService<ConfigHandler>();
     private readonly OpenAiClient _openAiClient = provider.GetRequiredService<OpenAiClient>();
     
-    private Dictionary<CommitStyle, string> _commitStyleSelections = new()
+    private readonly Dictionary<CommitLength, string> _commitLengthSelections = new()
     {
-        { CommitStyle.Minimal, $"{CommitStyle.Minimal} (Short, one-line commit message.)" },
-        { CommitStyle.Standard, $"{CommitStyle.Standard} (Clear commit message with brief context.)" },
-        { CommitStyle.Detailed, $"{CommitStyle.Detailed} (Descriptive commit message followed by an in-depth explanation.)" },
+        { CommitLength.Short, FormatCommitLengthSelection(CommitLength.Short) },
+        { CommitLength.Standard, FormatCommitLengthSelection(CommitLength.Standard) },
+        { CommitLength.Long, FormatCommitLengthSelection(CommitLength.Long) },
     };
 
-    private Dictionary<LlmModel, string> _llmSelections = new()
-    {
-        { LlmModel.Gpt4o, $"{LlmModel.Gpt4o.ToDisplayName()} ({LlmModel.Gpt4o.GetStats()})" },
-        { LlmModel.Gpt4oMini, $"{LlmModel.Gpt4oMini.ToDisplayName()} ({LlmModel.Gpt4oMini.GetStats()})" },
-        { LlmModel.Gpt4_1, $"{LlmModel.Gpt4_1.ToDisplayName()} ({LlmModel.Gpt4_1.GetStats()})" },
-        { LlmModel.Gpt4_1Mini, $"{LlmModel.Gpt4_1Mini.ToDisplayName()} ({LlmModel.Gpt4_1Mini.GetStats()})" },
-        { LlmModel.Gpt4_1Nano, $"{LlmModel.Gpt4_1Nano.ToDisplayName()} ({LlmModel.Gpt4_1Nano.GetStats()})" }
-    };
+    private Dictionary<LlmModel, string> _llmSelections = Enum
+        .GetValues<LlmModel>()
+        .ToDictionary(model => model, model => $"{model.ToDisplayName()} ({model.GetStats()})");
 
     public void Execute(Dictionary<string, object?> args)
     {
@@ -62,7 +61,10 @@ public class ConfigurationCommand(IServiceProvider provider) : ICommand
             switch (arg)
             {
                 case CommitStyleArg:
-                    MakeCommitStyleSelection(ref toolConfig);
+                    MakeCommitStyleSelection(toolConfig);
+                    break;
+                case CommitLengthArg:
+                    MakeCommitLengthSelection(toolConfig);
                     break;
                 case ApiKeyArg:
                     UpdateApiKey(value!.ToString()!);
@@ -101,22 +103,53 @@ public class ConfigurationCommand(IServiceProvider provider) : ICommand
         }
     }
 
-    private void MakeCommitStyleSelection(ref ToolConfiguration toolConfig)
+    private void MakeCommitStyleSelection(ToolConfiguration toolConfig)
     { 
-       EnumExtensions.UpdateSelectedOption(ref _commitStyleSelections, toolConfig.CommitStyle);
-
-       var selection = AnsiConsole.Prompt(new SelectionPrompt<string>()
-            .Title("Select a commit style that fits your needs:")
-            .AddChoices(_commitStyleSelections.Values));
+        var selectedCommitStyle = CommitStyleSelector.Select(
+            toolConfig.CommitStyle, 
+            "Select a commit style that fits your needs:");
        
-       var selectedCommitStyle = _commitStyleSelections
-           .First(p => p.Value == selection)
-           .Key
-           .ToString();
-       
-       toolConfig.CommitStyle = selectedCommitStyle;
-       ConsoleWrapper.Info($"Commit style has been updated to \"{selectedCommitStyle}\".");
+        toolConfig.CommitStyle = selectedCommitStyle.ToString();
+        ConsoleWrapper.Info($"Commit style has been updated to \"{selectedCommitStyle}\".");
     }
+
+    private void MakeCommitLengthSelection(ToolConfiguration toolConfig)
+    {
+        var customLengthConfigured = int.TryParse(toolConfig.CommitLength, out var configuredCustomLength);
+        
+        var presetSelections = new Dictionary<CommitLength, string>(_commitLengthSelections);
+        if (!customLengthConfigured)
+        {
+            EnumExtensions.UpdateSelectedOption(ref presetSelections, toolConfig.CommitLength);
+        }
+
+        var customSelection = customLengthConfigured
+            ? Markup.Escape($"[X] {CustomCommitLengthOption} (Currently {configuredCustomLength} characters.)")
+            : CustomCommitLengthOption;
+        
+        var selection = AnsiConsole.Prompt(new SelectionPrompt<string>()
+            .Title("Select the maximum length of the commit message subject line:")
+            .AddChoices(presetSelections.Values.Append(customSelection)));
+
+        var selectedCommitLength = selection == customSelection
+            ? PromptForCustomCommitLength().ToString()
+            : presetSelections.First(p => p.Value == selection).Key.ToString();
+
+        toolConfig.CommitLength = selectedCommitLength;
+        ConsoleWrapper.Info($"Commit length has been updated to \"{selectedCommitLength}\".");
+    }
+
+    private int PromptForCustomCommitLength() =>
+        AnsiConsole.Prompt(new TextPrompt<int>(
+                $"Enter the maximum subject line length in characters "
+                + $"({CommitLengthResolver.MinCustomLength}-{CommitLengthResolver.MaxCustomLength}):")
+            .Validate(length => CommitLengthResolver.IsValidCustomLength(length)
+                ? ValidationResult.Success()
+                : ValidationResult.Error($"[red]A commit length between {CommitLengthResolver.MinCustomLength} "
+                                         + $"and {CommitLengthResolver.MaxCustomLength} characters is required.[/]")));
+
+    private static string FormatCommitLengthSelection(CommitLength length)
+        => $"{length} (Up to {length.ToMaxSubjectLength()} characters. {length.GetDescription()})";
 
     private void UpdateApiKey(string apiKey)
     {
